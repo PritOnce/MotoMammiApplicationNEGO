@@ -1,6 +1,7 @@
 package com.dam.tfg.MotoMammiApplicationNEGO.services.impl;
 
 import com.dam.tfg.MotoMammiApplicationNEGO.models.ProvidersDTO;
+import com.dam.tfg.MotoMammiApplicationNEGO.repositories.InterfaceRepository;
 import com.dam.tfg.MotoMammiApplicationNEGO.repositories.ProviderRepository;
 import com.dam.tfg.MotoMammiApplicationNEGO.services.ProcesService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -35,6 +37,8 @@ public class ProcesServiceImpl implements ProcesService {
 
     @Autowired
     ProviderRepository providerRepository;
+    @Autowired
+    InterfaceRepository interfaceRepository;
 
     public void readFileInfo(String pSource){
         try {
@@ -46,11 +50,12 @@ public class ProcesServiceImpl implements ProcesService {
 
                 try{
                     String path = getNameFile(pSource, prov.getCodProv(), String.valueOf(java.time.LocalDate.now()));
-                    FileReader fr = new FileReader( new File(path) );
+                    FileReader fr = new FileReader(path);
                     BufferedReader br = new BufferedReader(fr);
                     String linea;
+                    linea = br.readLine();
                     while ( (linea = br.readLine()) != null ){
-                        System.out.println(linea);
+                        setDataOnInterface(linea);
                     }
                 }catch (Exception e){
                     System.out.println("FICHERO NO ENCONTRADO");
@@ -67,5 +72,9 @@ public class ProcesServiceImpl implements ProcesService {
         String path = relativePath+pathIn+customerFile+codProv+"_"+fecha[0]+fecha[1]+fecha[2]+extension;
 
         return path;
+    }
+
+    private void setDataOnInterface(String data){
+        String[] lineaSplit = data.split(",");
     }
 }
