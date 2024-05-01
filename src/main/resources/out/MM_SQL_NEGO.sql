@@ -1,7 +1,7 @@
 CREATE DATABASE MM_NEGO;
 
 CREATE TABLE MM_PROVIDERS(
-id int primary key,
+id int primary key auto_increment,
 codProv varchar(100) unique,
 name varchar(100),
 dateIni date,
@@ -10,7 +10,7 @@ SwiAct boolean
 );
 
 CREATE TABLE MM_INTERFACE(
-id int primary key,
+id int primary key auto_increment,
 codExternal varchar(100), -- DNI CUSTOMER
 codProv varchar(100),
 contJson longtext,
@@ -64,23 +64,23 @@ foreign key (plate) references MM_CUSTOMER(plate)
 );
 
 -- Inserts para MM_PROVIDERS
-INSERT INTO MM_PROVIDERS (id, codprov, name, dateIni, dateEnd, SwiAct) VALUES
-(1, 'CAX', 'La Caixa', '2024/01/10', '2024/11/19', true),
-(2, 'ING', 'Banco ING', '2023/05/23', '2024/05/23', false),
-(3, 'COL', 'COLONIA', '2022/04/07', '2024/03/18', true),
-(4, 'BBVA', 'Banco BBVA', '2024/03/13', '2025/01/10', false);
+INSERT INTO MM_PROVIDERS (codProv, name, dateIni, dateEnd, SwiAct) VALUES
+('CAX', 'La Caixa', '2024/01/10', '2024/11/19', true),
+('ING', 'Banco ING', '2023/05/23', '2024/05/23', true),
+('COL', 'COLONIA', '2022/04/07', '2024/03/18', true),
+('BBVA', 'Banco BBVA', '2024/03/13', '2025/01/10', false);
 
 -- Inserts para MM_TRANSLATIONS
-INSERT INTO MM_TRANSLATIONS (id, codprov, internalCode, externalCode, dateIni, dateEnd) VALUES
-(1, 'CAX', 'C/', 'Car', '2024/03/13', NULL),
-(2, 'CAX','AV', 'Aven', '2024/03/13', NULL),
-(3, 'CAX','PL', 'Plz', '2024/03/13', NULL),
-(4, 'ING','C/', 'Calle', '2024/03/13', NULL),
-(5, 'ING','AV', 'Avenida', '2024/03/13', NULL),
-(6, 'ING','PL', 'P.', '2024/03/13', NULL),
-(7, 'COL','C/', 'Carrer', '2024/03/13', NULL),
-(8, 'COL','AV', 'Avenguda', '2024/03/13', NULL),
-(9, 'COL','PL', 'Plaça', '2024/03/13', NULL),
-(10, 'BBVA','C/', 'Camino', '2024/03/13', NULL),
-(11, 'BBVA','AV', 'Avend', '2024/03/13', NULL),
-(12, 'BBVA','PL', 'P/', '2024/03/13', NULL);
+INSERT INTO MM_TRANSLATIONS (codProv, internalCode, externalCode, dateIni, dateEnd) VALUES
+('CAX', 'C/', 'Car', '2024/03/13', NULL),
+('CAX','AV', 'Aven', '2024/03/13', NULL),
+('CAX','PL', 'Plz', '2024/03/13', NULL),
+('ING','C/', 'Calle', '2024/03/13', NULL),
+('ING','AV', 'Avenida', '2024/03/13', NULL),
+('ING','PL', 'P.', '2024/03/13', NULL),
+('COL','C/', 'Carrer', '2024/03/13', NULL),
+('COL','AV', 'Avenguda', '2024/03/13', NULL),
+('COL','PL', 'Plaça', '2024/03/13', NULL),
+('BBVA','C/', 'Camino', '2024/03/13', NULL),
+('BBVA','AV', 'Avend', '2024/03/13', NULL),
+('BBVA','PL', 'P/', '2024/03/13', NULL);

@@ -8,10 +8,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class ProviderRepository implements ObjectRepository{
+public class ProviderRepository implements ObjectRepository<ProvidersDTO> {
 
     @Override
-    public void store(Object o) {
+    public void store(List<ProvidersDTO> providersDTOList) {
 
     }
 
@@ -27,12 +27,12 @@ public class ProviderRepository implements ObjectRepository{
     }
 
     @Override
-    public Object search(String name) {
+    public ProvidersDTO search(String name) {
         return null;
     }
 
     @Override
-    public Object delete(int id) {
+    public ProvidersDTO delete(int id) {
         return null;
     }
 }

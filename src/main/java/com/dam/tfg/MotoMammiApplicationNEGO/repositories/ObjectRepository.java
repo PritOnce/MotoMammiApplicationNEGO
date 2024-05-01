@@ -1,9 +1,11 @@
 package com.dam.tfg.MotoMammiApplicationNEGO.repositories;
 
-public interface ObjectRepository<T> {
-    public void store(T t);
+import java.util.List;
 
-    public T retrieve();
+public interface ObjectRepository<T> {
+    public void store(List<T> t);
+
+    public List<T> retrieve();
 
     public T search(String name);
 
