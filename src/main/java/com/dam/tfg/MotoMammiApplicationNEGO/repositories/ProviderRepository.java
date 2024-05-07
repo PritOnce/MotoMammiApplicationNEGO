@@ -11,7 +11,11 @@ import java.util.List;
 public class ProviderRepository implements ObjectRepository<ProvidersDTO> {
 
     @Override
-    public void store(List<ProvidersDTO> providersDTOList) {
+    public void storeList(List<ProvidersDTO> providersDTOList) {
+
+    }
+
+    public void store(ProvidersDTO providersDTO) {
 
     }
 

@@ -1,7 +1,9 @@
 package com.dam.tfg.MotoMammiApplicationNEGO.services.impl;
 
+import com.dam.tfg.MotoMammiApplicationNEGO.models.CustomerDTO;
 import com.dam.tfg.MotoMammiApplicationNEGO.models.InterfaceDTO;
 import com.dam.tfg.MotoMammiApplicationNEGO.models.ProvidersDTO;
+import com.dam.tfg.MotoMammiApplicationNEGO.repositories.CustomerRepository;
 import com.dam.tfg.MotoMammiApplicationNEGO.repositories.InterfaceRepository;
 import com.dam.tfg.MotoMammiApplicationNEGO.repositories.ProviderRepository;
 import com.dam.tfg.MotoMammiApplicationNEGO.services.ProcesService;
@@ -45,6 +47,8 @@ public class ProcesServiceImpl implements ProcesService {
     ProviderRepository providerRepository;
     @Autowired
     InterfaceRepository interfaceRepository;
+    @Autowired
+    CustomerRepository customerRepository;
 
     public void readFileInfo(String pSource){
         try {
@@ -89,30 +93,34 @@ public class ProcesServiceImpl implements ProcesService {
     }
 
     private void setDataOnInterface(List<String> data, String codProv) {
-        List<InterfaceDTO> interfaceDTOList = new ArrayList<InterfaceDTO>();
         Gson gson = new Gson();
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        JsonObject jsonObject = new JsonObject();
         try {
             for (String d : data) {
                 InterfaceDTO interfaceDTO = new InterfaceDTO();
+                CustomerDTO customerDTO = new CustomerDTO();
                 String[] datos = d.split(",");
+                Date dateBirth = dateFormat.parse(datos[5]);
 
-                jsonObject.addProperty("DNI", datos[0]);
-                jsonObject.addProperty("Nombre", datos[1]);
-                jsonObject.addProperty("Apellido1", datos[2]);
-                jsonObject.addProperty("Apellido2", datos[3]);
-                jsonObject.addProperty("CorreoElectronico", datos[4]);
-                jsonObject.addProperty("FechaNacimiento", datos[5]);
-                jsonObject.addProperty("TipoVia", datos[6]);
-                jsonObject.addProperty("Ciudad", datos[7]);
-                jsonObject.addProperty("Numero", datos[8]);
-                jsonObject.addProperty("Telefono", datos[9]);
-                jsonObject.addProperty("Sexo", datos[10]);
+                customerDTO.setDni(datos[0]);
+                customerDTO.setName(datos[1]);
+                customerDTO.setFirstSurname(datos[2]);
+                customerDTO.setLastSurname(datos[3]);
+                customerDTO.setEmail(datos[4]);
+                customerDTO.setBirthDate(dateBirth);
+                customerDTO.setDni(datos[6]);
+                customerDTO.setPostalCode(datos[7]);
+                customerDTO.setStreetType(datos[8]);
+                customerDTO.setCity(datos[9]);
+                customerDTO.setNumber(Integer.parseInt(datos[10]));
+                customerDTO.setPhone(datos[11]);
+                customerDTO.setLicenseType(datos[12]);
+                customerDTO.setPlate(datos[13]);
 
-                String json = gson.toJson(jsonObject);
-                System.out.println(json);
+                customerRepository.store(customerDTO);
+                String json = gson.toJson(customerDTO);
 
                 // Establecer los valores de InterfaceDTO según sea necesario
                 interfaceDTO.setCodExternal(datos[0]);
@@ -128,17 +136,16 @@ public class ProcesServiceImpl implements ProcesService {
                 interfaceDTO.setOperation("NEW");
                 interfaceDTO.setResource("Customer");
 
-                interfaceDTOList.add(interfaceDTO);
-
+                interfaceRepository.store(interfaceDTO);
             }
-            interfaceRepository.store(interfaceDTOList);
+
         } catch (NullPointerException nullPointerException) {
             if(!data.isEmpty()){
                 InterfaceDTO interfaceDTO = new InterfaceDTO();
                 interfaceDTO.setCodError("220");
                 interfaceDTO.setErrorMessage(nullPointerException.getMessage());
                 interfaceDTO.setStatusProcess("E");
-                interfaceRepository.store(Arrays.asList(interfaceDTO));
+                interfaceRepository.store(interfaceDTO);
             }
         } catch (Exception e) {
             if(!data.isEmpty()) {
@@ -146,7 +153,7 @@ public class ProcesServiceImpl implements ProcesService {
                 interfaceDTO.setCodError("220");
                 interfaceDTO.setErrorMessage(e.getMessage());
                 interfaceDTO.setStatusProcess("E");
-                interfaceRepository.store(Arrays.asList(interfaceDTO));
+                interfaceRepository.store(interfaceDTO);
             }
         }
     }

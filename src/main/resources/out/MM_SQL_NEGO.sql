@@ -20,7 +20,7 @@ createdBy varchar(100),
 updateBy varchar(100),
 codError varchar(20),
 errorMessage longtext,
-statusProccess varchar(10) default "N",
+statusProccess varchar(10) default 'N',
 operation varchar(20),
 `resource` varchar(20),
 foreign key (codProv) references MM_PROVIDERS(codProv)

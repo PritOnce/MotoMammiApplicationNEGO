@@ -12,7 +12,7 @@ import java.util.List;
 public class InterfaceRepository implements ObjectRepository<InterfaceDTO> {
 
     @Transactional
-    public void store(List<InterfaceDTO> interfaceDTOList) {
+    public void storeList(List<InterfaceDTO> interfaceDTOList) {
         Session session = null;
         try {
             ConfigDB.buildSessionFactory();
@@ -28,10 +28,34 @@ public class InterfaceRepository implements ObjectRepository<InterfaceDTO> {
                 session.getTransaction().rollback();
             }
             System.out.println("Error al guardar en la base de datos");
+            e.printStackTrace();
         } finally {
             if (session != null) {
                 session.close();
                 ConfigDB.closeSessionFactory();
+            }
+        }
+    }
+
+    @Override
+    public void store(InterfaceDTO interfaceDTO) {
+        Session session = null;
+        try {
+            ConfigDB.buildSessionFactory();
+            session = ConfigDB.getCurrentSession();
+            session.beginTransaction();
+            session.save(interfaceDTO);
+            session.getTransaction().commit();
+            System.out.println("GUARDADO");
+        } catch (Exception e) {
+            if (session != null && session.getTransaction() != null && session.getTransaction().isActive()) {
+                session.getTransaction().rollback();
+            }
+            System.out.println("Error al guardar en la base de datos");
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
             }
         }
     }
