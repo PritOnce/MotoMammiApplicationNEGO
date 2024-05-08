@@ -27,7 +27,7 @@ foreign key (codProv) references MM_PROVIDERS(codProv)
 );
 
 CREATE TABLE MM_TRANSLATIONS(
-id int primary key,
+id int primary key auto_increment,
 codProv varchar(100),
 internalCode varchar(100),
 externalCode varchar(100),
@@ -41,7 +41,7 @@ id int auto_increment primary key,
 dni varchar(10) not null unique,
 `name` varchar(50),
 first_surname varchar(50),
-last_varchar varchar(50),
+last_surname varchar(50),
 email varchar(100),
 birth_date date, 
 postal_code varchar(20),

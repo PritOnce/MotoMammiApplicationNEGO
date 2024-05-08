@@ -110,12 +110,12 @@ public class ProcesServiceImpl implements ProcesService {
                 customerDTO.setLastSurname(datos[3]);
                 customerDTO.setEmail(datos[4]);
                 customerDTO.setBirthDate(dateBirth);
-                customerDTO.setDni(datos[6]);
-                customerDTO.setPostalCode(datos[7]);
-                customerDTO.setStreetType(datos[8]);
-                customerDTO.setCity(datos[9]);
-                customerDTO.setNumber(Integer.parseInt(datos[10]));
-                customerDTO.setPhone(datos[11]);
+                customerDTO.setPostalCode(datos[6]);
+                customerDTO.setStreetType(datos[7]);
+                customerDTO.setCity(datos[8]);
+                customerDTO.setNumber(Integer.parseInt(datos[9]));
+                customerDTO.setPhone(datos[10]);
+                customerDTO.setGender(datos[11]);
                 customerDTO.setLicenseType(datos[12]);
                 customerDTO.setPlate(datos[13]);
 
@@ -142,7 +142,7 @@ public class ProcesServiceImpl implements ProcesService {
         } catch (NullPointerException nullPointerException) {
             if(!data.isEmpty()){
                 InterfaceDTO interfaceDTO = new InterfaceDTO();
-                interfaceDTO.setCodError("220");
+                interfaceDTO.setCodError("230");
                 interfaceDTO.setErrorMessage(nullPointerException.getMessage());
                 interfaceDTO.setStatusProcess("E");
                 interfaceRepository.store(interfaceDTO);
@@ -154,6 +154,7 @@ public class ProcesServiceImpl implements ProcesService {
                 interfaceDTO.setErrorMessage(e.getMessage());
                 interfaceDTO.setStatusProcess("E");
                 interfaceRepository.store(interfaceDTO);
+                e.printStackTrace();
             }
         }
     }

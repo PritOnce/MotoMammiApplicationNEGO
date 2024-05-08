@@ -22,7 +22,7 @@ public class InterfaceRepository implements ObjectRepository<InterfaceDTO> {
                 session.save(dataInterfaceDTO);
             }
             session.getTransaction().commit();
-            System.out.println("GUARDADO");
+            System.out.println("GUARDADO EN LA TABLA INTERFACE");
         } catch (Exception e) {
             if (session != null && session.getTransaction() != null && session.getTransaction().isActive()) {
                 session.getTransaction().rollback();

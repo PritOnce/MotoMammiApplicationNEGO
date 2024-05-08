@@ -3,9 +3,11 @@ package com.dam.tfg.MotoMammiApplicationNEGO.repositories;
 import com.dam.tfg.MotoMammiApplicationNEGO.models.CustomerDTO;
 import com.dam.tfg.MotoMammiApplicationNEGO.utils.ConfigDB;
 import org.hibernate.Session;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public class CustomerRepository implements ObjectRepository<CustomerDTO> {
     @Override
     public void storeList(List<CustomerDTO> t) {
@@ -21,7 +23,7 @@ public class CustomerRepository implements ObjectRepository<CustomerDTO> {
             session.beginTransaction();
             session.save(customerDTO);
             session.getTransaction().commit();
-            System.out.println("GUARDADO");
+            System.out.println("GUARDADO EN LA TABLA CUSTOMER");
         } catch (Exception e) {
             if (session != null && session.getTransaction() != null && session.getTransaction().isActive()) {
                 session.getTransaction().rollback();
