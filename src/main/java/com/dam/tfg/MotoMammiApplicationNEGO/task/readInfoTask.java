@@ -16,7 +16,7 @@ public class readInfoTask {
     @Scheduled(cron = "${cron.task.getCustomer}")
     public void taskCustomer() {
        try {
-           procesService.readFileInfo(Constants.SOURCE_CUSTOMER);
+//           procesService.readFileInfo(Constants.SOURCE_CUSTOMER, null, null);
        }catch (Exception e){
            System.out.println(e.getMessage());
        }

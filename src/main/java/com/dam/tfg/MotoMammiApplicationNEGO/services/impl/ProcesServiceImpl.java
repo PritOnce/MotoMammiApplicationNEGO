@@ -50,7 +50,8 @@ public class ProcesServiceImpl implements ProcesService {
     @Autowired
     CustomerRepository customerRepository;
 
-    public void readFileInfo(String pSource){
+    CustomerDTO customerDTO = new CustomerDTO();
+    public void readFileInfo(String pSource, String codProv, String date) {
         try {
             System.out.println("HORA ACTUAL CADA 15 SEGUNDOS: " + dateFormat.format(new Date()) + " pSoruce: " + pSource);
             List<ProvidersDTO> proveedor = providerRepository.retrieve();
@@ -85,6 +86,32 @@ public class ProcesServiceImpl implements ProcesService {
         }
     }
 
+
+
+    @Override
+    public void integrateInfo(String pSource, String codProv, String date) {
+        Gson gson = new Gson();
+        List<InterfaceDTO> interfaceDTOS = interfaceRepository.retrieve();
+        for (InterfaceDTO interfaceDTO: interfaceDTOS) {
+            CustomerDTO c= gson.fromJson(interfaceDTO.getContJson(), CustomerDTO.class);
+            String traducido = fncTranslate (c.getStreetType(),codProv);
+            c.setStreetType(traducido);
+            customerRepository.store(c);
+            interfaceDTO.setStatusProcess("P");
+        }
+    }
+
+    private String fncTranslate(String streetType, String codProv) {
+
+
+
+        return streetType;
+    }
+
+
+
+
+
     private String getNameFile(String pSource, String codProv, String date){
         String[] fecha = date.split("-");
         String path = relativePath+pathIn+customerFile+codProv+"_"+fecha[0]+fecha[1]+fecha[2]+extension;
@@ -95,12 +122,12 @@ public class ProcesServiceImpl implements ProcesService {
     private void setDataOnInterface(List<String> data, String codProv) {
         Gson gson = new Gson();
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         try {
             for (String d : data) {
                 InterfaceDTO interfaceDTO = new InterfaceDTO();
-                CustomerDTO customerDTO = new CustomerDTO();
                 String[] datos = d.split(",");
                 Date dateBirth = dateFormat.parse(datos[5]);
 
@@ -119,7 +146,6 @@ public class ProcesServiceImpl implements ProcesService {
                 customerDTO.setLicenseType(datos[12]);
                 customerDTO.setPlate(datos[13]);
 
-                customerRepository.store(customerDTO);
                 String json = gson.toJson(customerDTO);
 
                 // Establecer los valores de InterfaceDTO según sea necesario
@@ -132,7 +158,7 @@ public class ProcesServiceImpl implements ProcesService {
                 interfaceDTO.setUpdateBy("admin");
                 interfaceDTO.setCodError(null);
                 interfaceDTO.setErrorMessage(null);
-                interfaceDTO.setStatusProcess("P");
+                interfaceDTO.setStatusProcess("N");
                 interfaceDTO.setOperation("NEW");
                 interfaceDTO.setResource("Customer");
 
@@ -158,5 +184,6 @@ public class ProcesServiceImpl implements ProcesService {
             }
         }
     }
+
 
 }

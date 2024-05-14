@@ -1,5 +1,5 @@
 CREATE DATABASE MM_NEGO;
-
+drop database mm_nego;
 CREATE TABLE MM_PROVIDERS(
 id int primary key auto_increment,
 codProv varchar(100) unique,

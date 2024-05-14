@@ -62,7 +62,11 @@ public class InterfaceRepository implements ObjectRepository<InterfaceDTO> {
 
     @Override
     public List<InterfaceDTO> retrieve() {
-        return null;
+        ConfigDB.buildSessionFactory();
+        List<InterfaceDTO> interfaceDTOS = (List<InterfaceDTO>) ConfigDB.getCurrentSession()
+                .createQuery("from InterfaceDTO where statusProccess = 'N'").list();
+        System.out.println("Consulta en Interface");
+        return interfaceDTOS;
     }
 
     @Override
