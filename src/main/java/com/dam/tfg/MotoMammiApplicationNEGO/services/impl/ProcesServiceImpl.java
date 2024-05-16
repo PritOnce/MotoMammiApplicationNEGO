@@ -86,44 +86,39 @@ public class ProcesServiceImpl implements ProcesService {
         }
     }
 
-
-
     @Override
     public void integrateInfo(String pSource, String codProv, String date) {
         Gson gson = new Gson();
-        List<InterfaceDTO> interfaceDTOS = interfaceRepository.retrieve();
-        for (InterfaceDTO interfaceDTO: interfaceDTOS) {
-            CustomerDTO c= gson.fromJson(interfaceDTO.getContJson(), CustomerDTO.class);
-            String traducido = fncTranslate (c.getStreetType(),codProv);
-            c.setStreetType(traducido);
-            customerRepository.store(c);
-            interfaceDTO.setStatusProcess("P");
+        Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+
+        try{
+            List<InterfaceDTO> interfaceDTOS = interfaceRepository.retrieve();
+            for (InterfaceDTO interfaceDTO: interfaceDTOS) {
+                CustomerDTO c= gson.fromJson(interfaceDTO.getContJson(), CustomerDTO.class);
+                String traducido = fncTranslate(c.getStreetType(),codProv);
+                c.setStreetType(traducido);
+                customerRepository.store(c);
+                interfaceDTO.setUpdateBy("admin");
+                interfaceDTO.setLastUpdate(currentTimestamp);
+                interfaceDTO.setStatusProcess("P");
+                interfaceRepository.update(interfaceDTO);
+            }
+        }catch (Exception e){
+            InterfaceDTO interfaceDTO = new InterfaceDTO();
+            interfaceDTO.setUpdateBy("admin");
+            interfaceDTO.setLastUpdate(currentTimestamp);
+            interfaceDTO.setCodError("240");
+            interfaceDTO.setErrorMessage(e.getMessage());
+            interfaceDTO.setStatusProcess("E");
+            interfaceRepository.update(interfaceDTO);
         }
-    }
-
-    private String fncTranslate(String streetType, String codProv) {
-
-
-
-        return streetType;
-    }
-
-
-
-
-
-    private String getNameFile(String pSource, String codProv, String date){
-        String[] fecha = date.split("-");
-        String path = relativePath+pathIn+customerFile+codProv+"_"+fecha[0]+fecha[1]+fecha[2]+extension;
-
-        return path;
     }
 
     private void setDataOnInterface(List<String> data, String codProv) {
         Gson gson = new Gson();
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
         try {
             for (String d : data) {
@@ -185,5 +180,71 @@ public class ProcesServiceImpl implements ProcesService {
         }
     }
 
+    private String fncTranslate(String streetType, String codProv) {
+
+        switch (codProv) {
+            case "CAX" -> {
+                switch (streetType) {
+                    case "Car":
+                        streetType = "C/";
+                        break;
+                    case "Aven":
+                        streetType = "AV";
+                        break;
+                    case "Plz":
+                        streetType = "PL";
+                        break;
+                }
+            }
+            case "ING" -> {
+                switch (streetType) {
+                    case "Calle":
+                        streetType = "C/";
+                        break;
+                    case "Avenida":
+                        streetType = "AV";
+                        break;
+                    case "P.":
+                        streetType = "PL";
+                        break;
+                }
+            }
+            case "BBVA" -> {
+                switch (streetType) {
+                    case "Camino":
+                        streetType = "C/";
+                        break;
+                    case "Avend":
+                        streetType = "AV";
+                        break;
+                    case "P/":
+                        streetType = "PL";
+                        break;
+                }
+            }
+            case "COL" -> {
+                switch (streetType) {
+                    case "Carrer":
+                        streetType = "C/";
+                        break;
+                    case "Avenguda":
+                        streetType = "AV";
+                        break;
+                    case "Plaça":
+                        streetType = "PL";
+                        break;
+                }
+            }
+        }
+
+        return streetType;
+    }
+
+    private String getNameFile(String pSource, String codProv, String date){
+        String[] fecha = date.split("-");
+        String path = relativePath+pathIn+customerFile+codProv+"_"+fecha[0]+fecha[1]+fecha[2]+extension;
+
+        return path;
+    }
 
 }

@@ -12,4 +12,6 @@ public interface ObjectRepository<T> {
     public T search(String name);
 
     public T delete(int id);
+
+    public T update(T t);
 }

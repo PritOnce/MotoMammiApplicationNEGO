@@ -51,4 +51,9 @@ public class CustomerRepository implements ObjectRepository<CustomerDTO> {
     public CustomerDTO delete(int id) {
         return null;
     }
+
+    @Override
+    public CustomerDTO update(CustomerDTO customerDTO) {
+        return null;
+    }
 }

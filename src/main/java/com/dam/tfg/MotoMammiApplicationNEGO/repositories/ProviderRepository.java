@@ -39,4 +39,9 @@ public class ProviderRepository implements ObjectRepository<ProvidersDTO> {
     public ProvidersDTO delete(int id) {
         return null;
     }
+
+    @Override
+    public ProvidersDTO update(ProvidersDTO providersDTO) {
+        return null;
+    }
 }

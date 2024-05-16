@@ -23,8 +23,8 @@ public class AppInsuranceController
     ){
         try{
             System.out.println("\nEsta tarea se lanza cada 15 segundos");
-            pService.readFileInfo(Constants.SOURCE_CUSTOMER,codprov,date);
-
+//            pService.readFileInfo(Constants.SOURCE_CUSTOMER,codprov,date);
+            pService.integrateInfo(Constants.SOURCE_CUSTOMER,codprov,date);
 
         } catch (Exception e){
             System.err.println("heey pero me estoy poniendo peluche yo 😏😏");
