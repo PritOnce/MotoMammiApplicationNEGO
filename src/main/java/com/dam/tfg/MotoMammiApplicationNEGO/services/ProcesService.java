@@ -6,5 +6,5 @@ import org.springframework.stereotype.Service;
 public interface ProcesService {
 
     public void readFileInfo(String pSource, String codProv, String date);//pSource = origen/fuente de los datos
-    public void integrateInfo(String pSource, String codProv, String date);
+    public void integrateInfo(String pSource, String codProv);
 }

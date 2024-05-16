@@ -43,7 +43,7 @@ public class CustomerRepository implements ObjectRepository<CustomerDTO> {
     }
 
     @Override
-    public CustomerDTO search(String name) {
+    public CustomerDTO search(String codExternal, String codProv) {
         return null;
     }
 

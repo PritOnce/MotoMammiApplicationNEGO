@@ -14,17 +14,21 @@ public class AppInsuranceController
     @Autowired
     ProcesService pService;
 
-    @RequestMapping(value =("/readInfo/{resource}/{codprov}/{date}"),
+    @RequestMapping(value =("/appInsurance/v1/readInfoFileNEGO/{resource}/{codprov}/{date}"),
             method = RequestMethod.GET,
             produces = "application/json")
     String callProcessReadInfo(@PathVariable String resource,
                                @PathVariable String codprov,
                                @PathVariable String date//"20240423"
     ){
+        if (resource.isEmpty()){
+            return "ERROR: El resource es obligatorio";
+        }
+
         try{
             System.out.println("\nEsta tarea se lanza cada 15 segundos");
-//            pService.readFileInfo(Constants.SOURCE_CUSTOMER,codprov,date);
-            pService.integrateInfo(Constants.SOURCE_CUSTOMER,codprov,date);
+            pService.readFileInfo(resource,codprov,date);
+            pService.integrateInfo(resource,codprov);
 
         } catch (Exception e){
             System.err.println("heey pero me estoy poniendo peluche yo 😏😏");

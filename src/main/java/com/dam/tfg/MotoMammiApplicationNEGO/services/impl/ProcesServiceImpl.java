@@ -30,10 +30,10 @@ public class ProcesServiceImpl implements ProcesService {
 
     @Value("${nameFile.customers}")
     private String customerFile;
-    @Value("${nameFile.providers}")
+    @Value("${nameFile.vehicles}")
     private String providersFile;
     @Value("${nameFile.parts}")
-    private String insuranceFile;
+    private String partsFile;
     @Value("${nameFile.customers.ext}")
     private String extension;
     @Value("${relative.path}")
@@ -51,6 +51,7 @@ public class ProcesServiceImpl implements ProcesService {
     CustomerRepository customerRepository;
 
     CustomerDTO customerDTO = new CustomerDTO();
+
     public void readFileInfo(String pSource, String codProv, String date) {
         try {
             System.out.println("HORA ACTUAL CADA 15 SEGUNDOS: " + dateFormat.format(new Date()) + " pSoruce: " + pSource);
@@ -60,15 +61,18 @@ public class ProcesServiceImpl implements ProcesService {
                         prov.getDateEnd() + " " + prov.isSwiAct() + " " + LocalDate.now());
 
                 try{
-                    String path = getNameFile(pSource, prov.getCodProv(), String.valueOf(LocalDate.now()));
+                    String codigoProveedor;
 
-                    if(!new File(path).exists()) {
-                        continue;
+                    if (codProv.isEmpty()){
+                        codigoProveedor = prov.getCodProv();
+                    } else {
+                        codigoProveedor = codProv;
                     }
+                    String path = getNameFile(pSource, codProv, date, prov.getCodProv());
+
                     FileReader fr = new FileReader(path);
                     BufferedReader br = new BufferedReader(fr);
                     String linea;
-                    String codigoProveedor = prov.getCodProv();
                     br.readLine();
                     List<String> list = new ArrayList<>();
                     while ( (linea = br.readLine()) != null ){
@@ -87,25 +91,36 @@ public class ProcesServiceImpl implements ProcesService {
     }
 
     @Override
-    public void integrateInfo(String pSource, String codProv, String date) {
+    public void integrateInfo(String pSource, String codProv) {
         Gson gson = new Gson();
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
-
         try{
             List<InterfaceDTO> interfaceDTOS = interfaceRepository.retrieve();
             for (InterfaceDTO interfaceDTO: interfaceDTOS) {
-                CustomerDTO c= gson.fromJson(interfaceDTO.getContJson(), CustomerDTO.class);
-                String traducido = fncTranslate(c.getStreetType(),codProv);
-                c.setStreetType(traducido);
-                customerRepository.store(c);
-                interfaceDTO.setUpdateBy("admin");
-                interfaceDTO.setLastUpdate(currentTimestamp);
-                interfaceDTO.setStatusProcess("P");
-                interfaceRepository.update(interfaceDTO);
+
+                if (codProv.isEmpty()){
+                    CustomerDTO c= gson.fromJson(interfaceDTO.getContJson(), CustomerDTO.class);
+                    String traducido = fncTranslate(c.getStreetType(),interfaceDTO.getCodProv());
+                    c.setStreetType(traducido);
+                    customerRepository.store(c);
+                    interfaceDTO.setUpdateBy("system");
+                    interfaceDTO.setLastUpdate(currentTimestamp);
+                    interfaceDTO.setStatusProcess("P");
+                    interfaceRepository.update(interfaceDTO);
+                }else {
+                    CustomerDTO c= gson.fromJson(interfaceDTO.getContJson(), CustomerDTO.class);
+                    String traducido = fncTranslate(c.getStreetType(),codProv);
+                    c.setStreetType(traducido);
+                    customerRepository.store(c);
+                    interfaceDTO.setUpdateBy("system");
+                    interfaceDTO.setLastUpdate(currentTimestamp);
+                    interfaceDTO.setStatusProcess("P");
+                    interfaceRepository.update(interfaceDTO);
+                }
             }
         }catch (Exception e){
             InterfaceDTO interfaceDTO = new InterfaceDTO();
-            interfaceDTO.setUpdateBy("admin");
+            interfaceDTO.setUpdateBy("system");
             interfaceDTO.setLastUpdate(currentTimestamp);
             interfaceDTO.setCodError("240");
             interfaceDTO.setErrorMessage(e.getMessage());
@@ -119,6 +134,8 @@ public class ProcesServiceImpl implements ProcesService {
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+
+        List<InterfaceDTO> interfaceDTOs = new ArrayList<>();
 
         try {
             for (String d : data) {
@@ -143,6 +160,7 @@ public class ProcesServiceImpl implements ProcesService {
 
                 String json = gson.toJson(customerDTO);
 
+
                 // Establecer los valores de InterfaceDTO según sea necesario
                 interfaceDTO.setCodExternal(datos[0]);
                 interfaceDTO.setCodProv(codProv);
@@ -157,7 +175,18 @@ public class ProcesServiceImpl implements ProcesService {
                 interfaceDTO.setOperation("NEW");
                 interfaceDTO.setResource("Customer");
 
-                interfaceRepository.store(interfaceDTO);
+                interfaceDTOs.add(interfaceDTO);
+                boolean valid = validateInfo(interfaceDTOs, json);
+                System.out.println("IMPRIMIENDO EL BOOLEANO " + valid);
+
+                if(valid){
+                    interfaceRepository.store(interfaceDTO);
+                }else{
+                    interfaceDTO.setLastUpdate(currentTimestamp);
+                    interfaceDTO.setUpdateBy("admin");
+                    interfaceDTO.setOperation("UPDATE");
+                    interfaceRepository.store(interfaceDTO);
+                }
             }
 
         } catch (NullPointerException nullPointerException) {
@@ -178,6 +207,19 @@ public class ProcesServiceImpl implements ProcesService {
                 e.printStackTrace();
             }
         }
+    }
+
+    private boolean validateInfo(List<InterfaceDTO> interfaceDTOs, String json) {
+
+        for (InterfaceDTO interfaceDTO : interfaceDTOs) {
+            InterfaceDTO interfaceData = interfaceRepository.search(interfaceDTO.getCodExternal(), interfaceDTO.getCodProv());
+            if(interfaceData == null){
+                return true;
+            }else if(!json.equals(interfaceData.getContJson())){
+                return false;
+            }
+        }
+        return true;
     }
 
     private String fncTranslate(String streetType, String codProv) {
@@ -240,11 +282,20 @@ public class ProcesServiceImpl implements ProcesService {
         return streetType;
     }
 
-    private String getNameFile(String pSource, String codProv, String date){
+    private String getNameFile(String pSource, String codProv, String date, String codProvConsulta) {
         String[] fecha = date.split("-");
-        String path = relativePath+pathIn+customerFile+codProv+"_"+fecha[0]+fecha[1]+fecha[2]+extension;
+        String[] fechaHoy = LocalDate.now().toString().split("-");
 
-        return path;
+//        if (codProv.isEmpty() && date.isEmpty()){
+//            return relativePath+pathIn+customerFile+codProvConsulta+"_"+fechaHoy[0]+fechaHoy[1]+fechaHoy[2]+extension;
+//        } else if (codProv.isEmpty() && !date.isEmpty()) {
+//            return relativePath+pathIn+customerFile+codProvConsulta+"_"+fecha[0]+fecha[1]+fecha[2]+extension;
+//        } else if (!codProv.isEmpty() && date.isEmpty()) {
+//            return relativePath+pathIn+customerFile+codProv+"_"+fechaHoy[0]+fechaHoy[1]+fechaHoy[2]+extension;
+//        } else if (!codProv.isEmpty() && !date.isEmpty()) {
+//            return relativePath+pathIn+customerFile+codProv+"_"+fecha[0]+fecha[1]+fecha[2]+extension;
+//        }
+        return relativePath+pathIn+customerFile+codProv+"_"+fecha[0]+fecha[1]+fecha[2]+extension;
     }
 
 }

@@ -31,7 +31,7 @@ public class ProviderRepository implements ObjectRepository<ProvidersDTO> {
     }
 
     @Override
-    public ProvidersDTO search(String name) {
+    public ProvidersDTO search(String codExternal, String codProvs) {
         return null;
     }
 

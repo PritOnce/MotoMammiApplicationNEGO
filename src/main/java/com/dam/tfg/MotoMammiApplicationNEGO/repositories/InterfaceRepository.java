@@ -1,6 +1,7 @@
 package com.dam.tfg.MotoMammiApplicationNEGO.repositories;
 
 import com.dam.tfg.MotoMammiApplicationNEGO.models.InterfaceDTO;
+import com.dam.tfg.MotoMammiApplicationNEGO.models.ProvidersDTO;
 import com.dam.tfg.MotoMammiApplicationNEGO.utils.ConfigDB;
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.Session;
@@ -71,8 +72,13 @@ public class InterfaceRepository implements ObjectRepository<InterfaceDTO> {
     }
 
     @Override
-    public InterfaceDTO  search(String name) {
-        return null;
+    public InterfaceDTO search(String codExternal, String codProv) {
+        ConfigDB.buildSessionFactory();
+        List<InterfaceDTO> interfaces = (List<InterfaceDTO>) ConfigDB.getCurrentSession()
+                .createQuery("from InterfaceDTO where codExternal = :codigoExterno " +
+                        "and codProv = :codigoProveedor")
+                .setParameter("codigoExterno", codExternal).setParameter("codigoProv", codProv).list();
+        return (InterfaceDTO) interfaces;
     }
 
     @Override

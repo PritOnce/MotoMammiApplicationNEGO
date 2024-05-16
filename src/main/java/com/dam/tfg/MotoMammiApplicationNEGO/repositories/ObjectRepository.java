@@ -9,7 +9,7 @@ public interface ObjectRepository<T> {
 
     public List<T> retrieve();
 
-    public T search(String name);
+    public T search(String codExternal, String codProv);
 
     public T delete(int id);
 

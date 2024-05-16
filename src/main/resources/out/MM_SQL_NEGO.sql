@@ -63,6 +63,16 @@ model varchar(20),
 foreign key (plate) references MM_CUSTOMER(plate)
 );
 
+CREATE TABLE MM_PARTS (
+id INT PRIMARY KEY AUTO_INCREMENT,
+claim_number VARCHAR(20) UNIQUE,
+policy_number VARCHAR(20),
+claim_date DATE,
+`description` TEXT,
+`status` VARCHAR(20),
+amount DECIMAL(10, 2)
+);
+
 -- Inserts para MM_PROVIDERS
 INSERT INTO MM_PROVIDERS (codProv, name, dateIni, dateEnd, SwiAct) VALUES
 ('CAX', 'La Caixa', '2024/01/10', '2024/11/19', true),
