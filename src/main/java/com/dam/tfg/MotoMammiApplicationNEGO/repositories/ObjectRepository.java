@@ -10,6 +10,7 @@ public interface ObjectRepository<T> {
     public List<T> retrieve();
 
     public T search(String codExternal, String codProv);
+    public List<T> searchList(String codExternal, String codProv);
 
     public T delete(int id);
 

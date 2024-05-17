@@ -82,6 +82,7 @@ public class ProcesServiceImpl implements ProcesService {
                     setDataOnInterface(list, codigoProveedor);
                 }catch (Exception e){
                     System.out.println("FICHERO NO ENCONTRADO");
+                    e.printStackTrace();
                 }
             }
         }catch (Exception e){
@@ -135,7 +136,6 @@ public class ProcesServiceImpl implements ProcesService {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
-        List<InterfaceDTO> interfaceDTOs = new ArrayList<>();
 
         try {
             for (String d : data) {
@@ -175,15 +175,13 @@ public class ProcesServiceImpl implements ProcesService {
                 interfaceDTO.setOperation("NEW");
                 interfaceDTO.setResource("Customer");
 
-                interfaceDTOs.add(interfaceDTO);
-                boolean valid = validateInfo(interfaceDTOs, json);
-                System.out.println("IMPRIMIENDO EL BOOLEANO " + valid);
-
-                if(valid){
+                int valid = validateInfo(interfaceDTO, json);
+                System.out.println("VALOR DE VALID: " + valid);
+                if(valid == 0){
                     interfaceRepository.store(interfaceDTO);
-                }else{
+                }else if (valid == 1){
                     interfaceDTO.setLastUpdate(currentTimestamp);
-                    interfaceDTO.setUpdateBy("admin");
+                    interfaceDTO.setUpdateBy("sistema de comparacion");
                     interfaceDTO.setOperation("UPDATE");
                     interfaceRepository.store(interfaceDTO);
                 }
@@ -209,17 +207,16 @@ public class ProcesServiceImpl implements ProcesService {
         }
     }
 
-    private boolean validateInfo(List<InterfaceDTO> interfaceDTOs, String json) {
+    private int validateInfo(InterfaceDTO interfaceDTO, String json) {
 
-        for (InterfaceDTO interfaceDTO : interfaceDTOs) {
-            InterfaceDTO interfaceData = interfaceRepository.search(interfaceDTO.getCodExternal(), interfaceDTO.getCodProv());
-            if(interfaceData == null){
-                return true;
-            }else if(!json.equals(interfaceData.getContJson())){
-                return false;
-            }
+        InterfaceDTO interfaceData = interfaceRepository.search(interfaceDTO.getCodExternal(), interfaceDTO.getCodProv());
+        if(interfaceData == null){
+            return 0;
+        }else if (!json.equals(interfaceData.getContJson())){
+            return 1;
+        }else {
+            return 2;
         }
-        return true;
     }
 
     private String fncTranslate(String streetType, String codProv) {
@@ -283,19 +280,23 @@ public class ProcesServiceImpl implements ProcesService {
     }
 
     private String getNameFile(String pSource, String codProv, String date, String codProvConsulta) {
-        String[] fecha = date.split("-");
-        String[] fechaHoy = LocalDate.now().toString().split("-");
 
-//        if (codProv.isEmpty() && date.isEmpty()){
-//            return relativePath+pathIn+customerFile+codProvConsulta+"_"+fechaHoy[0]+fechaHoy[1]+fechaHoy[2]+extension;
-//        } else if (codProv.isEmpty() && !date.isEmpty()) {
-//            return relativePath+pathIn+customerFile+codProvConsulta+"_"+fecha[0]+fecha[1]+fecha[2]+extension;
-//        } else if (!codProv.isEmpty() && date.isEmpty()) {
-//            return relativePath+pathIn+customerFile+codProv+"_"+fechaHoy[0]+fechaHoy[1]+fechaHoy[2]+extension;
-//        } else if (!codProv.isEmpty() && !date.isEmpty()) {
-//            return relativePath+pathIn+customerFile+codProv+"_"+fecha[0]+fecha[1]+fecha[2]+extension;
-//        }
-        return relativePath+pathIn+customerFile+codProv+"_"+fecha[0]+fecha[1]+fecha[2]+extension;
+        String[] fechaActual = LocalDate.now().toString().split("-");
+
+        if ( !date.isEmpty() ) {
+            if (codProv.isEmpty()){
+                return relativePath+pathIn+customerFile+codProvConsulta+"_"+date+extension;
+            }else{
+                return relativePath+pathIn+customerFile+codProv+"_"+date+extension;
+            }
+        }
+
+        if (codProv.isEmpty()){
+            return relativePath+pathIn+customerFile+codProvConsulta+"_"+fechaActual[0]+fechaActual[1]+fechaActual[2]+extension;
+        }else{
+            return relativePath+pathIn+customerFile+codProv+"_"+fechaActual[0]+fechaActual[1]+fechaActual[2]+extension;
+        }
+
     }
 
 }

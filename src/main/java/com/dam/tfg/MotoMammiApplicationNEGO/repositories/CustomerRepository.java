@@ -48,6 +48,11 @@ public class CustomerRepository implements ObjectRepository<CustomerDTO> {
     }
 
     @Override
+    public List<CustomerDTO> searchList(String codExternal, String codProv) {
+        return null;
+    }
+
+    @Override
     public CustomerDTO delete(int id) {
         return null;
     }

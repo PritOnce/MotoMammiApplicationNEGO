@@ -77,8 +77,22 @@ public class InterfaceRepository implements ObjectRepository<InterfaceDTO> {
         List<InterfaceDTO> interfaces = (List<InterfaceDTO>) ConfigDB.getCurrentSession()
                 .createQuery("from InterfaceDTO where codExternal = :codigoExterno " +
                         "and codProv = :codigoProveedor")
-                .setParameter("codigoExterno", codExternal).setParameter("codigoProv", codProv).list();
-        return (InterfaceDTO) interfaces;
+                .setParameter("codigoExterno", codExternal).setParameter("codigoProveedor", codProv).list();
+        if (interfaces.isEmpty()) {
+            return null;
+        } else {
+            return interfaces.get(0); // Return the first matching result
+        }
+    }
+
+    @Override
+    public List<InterfaceDTO> searchList(String codExternal, String codProv) {
+        ConfigDB.buildSessionFactory();
+        List<InterfaceDTO> interfaces = (List<InterfaceDTO>) ConfigDB.getCurrentSession()
+                .createQuery("from InterfaceDTO where codExternal = :codigoExterno " +
+                        "and codProv = :codigoProveedor")
+                .setParameter("codigoExterno", codExternal).setParameter("codigoProveedor", codProv).list();
+        return interfaces;
     }
 
     @Override

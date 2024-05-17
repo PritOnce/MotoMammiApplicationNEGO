@@ -36,6 +36,11 @@ public class ProviderRepository implements ObjectRepository<ProvidersDTO> {
     }
 
     @Override
+    public List<ProvidersDTO> searchList(String codExternal, String codProv) {
+        return null;
+    }
+
+    @Override
     public ProvidersDTO delete(int id) {
         return null;
     }
