@@ -18,7 +18,7 @@ public class PartsDTO implements Serializable {
     private String dni;
 
     @Column(name = "claim_number", unique = true)
-    private String claimNumber;
+    private String claim_number;
 
     @Column(name = "policy_number")
     private String policyNumber;
@@ -55,11 +55,11 @@ public class PartsDTO implements Serializable {
     }
 
     public String getClaimNumber() {
-        return claimNumber;
+        return claim_number;
     }
 
-    public void setClaimNumber(String claimNumber) {
-        this.claimNumber = claimNumber;
+    public void setClaimNumber(String claim_number) {
+        this.claim_number = claim_number;
     }
 
     public String getPolicyNumber() {

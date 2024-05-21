@@ -1,12 +1,13 @@
 package com.dam.tfg.MotoMammiApplicationNEGO.repositories;
 
-import com.dam.tfg.MotoMammiApplicationNEGO.models.CustomerDTO;
 import com.dam.tfg.MotoMammiApplicationNEGO.models.VehicleDTO;
 import com.dam.tfg.MotoMammiApplicationNEGO.utils.ConfigDB;
 import org.hibernate.Session;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@Repository
 public class VehicleRepository implements ObjectRepository<VehicleDTO> {
     @Override
     public void storeList(List<VehicleDTO> t) {

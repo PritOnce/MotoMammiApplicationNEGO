@@ -47,9 +47,9 @@ public class PartRepository implements ObjectRepository<PartsDTO> {
     public PartsDTO search(String dni, String claimNumber) {
         ConfigDB.buildSessionFactory();
         List<PartsDTO> partsDTOS = (List<PartsDTO>) ConfigDB.getCurrentSession()
-                .createQuery("from PartsDTO where dni = :dni and claimNumber = :claimNumber")
+                .createQuery("from PartsDTO where dni = :dni and claim_number = :claimNumber")
                 .setParameter("dni", dni)
-                .setParameter("claimNumber", claimNumber).list();
+                .setParameter("claim_number", claimNumber).list();
         if (partsDTOS.isEmpty()) {
             return null;
         } else {

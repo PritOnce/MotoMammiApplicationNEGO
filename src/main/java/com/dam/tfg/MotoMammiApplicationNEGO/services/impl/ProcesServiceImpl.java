@@ -3,6 +3,7 @@ package com.dam.tfg.MotoMammiApplicationNEGO.services.impl;
 import com.dam.tfg.MotoMammiApplicationNEGO.models.*;
 import com.dam.tfg.MotoMammiApplicationNEGO.repositories.*;
 import com.dam.tfg.MotoMammiApplicationNEGO.services.ProcesService;
+import com.dam.tfg.MotoMammiApplicationNEGO.utils.Constants;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +25,7 @@ public class ProcesServiceImpl implements ProcesService {
     @Value("${nameFile.customers}")
     private String customerFile;
     @Value("${nameFile.vehicles}")
-    private String providersFile;
+    private String vehicleFile;
     @Value("${nameFile.parts}")
     private String partsFile;
     @Value("${nameFile.customers.ext}")
@@ -85,14 +86,16 @@ public class ProcesServiceImpl implements ProcesService {
                         list.add(linea);
                     }
 
+
+
                     switch (pSource){
-                        case "customers":
+                        case Constants.SOURCE_CUSTOMER:
                             serDataInterfaceCustomer(list, codigoProveedor, pSource);
                             break;
-                        case "vehicles":
+                        case Constants.SOURCE_VEHICLES:
                             serDataInterfaceVehicles(list, codigoProveedor, pSource);
                             break;
-                        case "parts":
+                        case Constants.SOURCE_PARTS:
                             serDataInterfaceParts(list, codigoProveedor, pSource);
                             break;
                     }
@@ -113,8 +116,6 @@ public class ProcesServiceImpl implements ProcesService {
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-
-
         try {
             for (String d : data) {
 
@@ -195,9 +196,6 @@ public class ProcesServiceImpl implements ProcesService {
     private void serDataInterfaceVehicles(List<String> data, String codProv, String pSource) {
         Gson gson = new Gson();
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
-
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
-
 
         try {
             for (String d : data) {
@@ -348,12 +346,14 @@ public class ProcesServiceImpl implements ProcesService {
 
         List<InterfaceDTO> interfaceDTOS = interfaceRepository.retrieve();
         switch (pSource) {
-            case "customers":
+            case Constants.SOURCE_CUSTOMER:
                 integrateInfoCustomer(codProv, interfaceDTOS);
                 break;
-                case "parts": integrateInfoParts(codProv, interfaceDTOS);
+            case Constants.SOURCE_PARTS:
+                integrateInfoParts(codProv, interfaceDTOS);
                 break;
-                case "vehicles": integrateInfoVehicles(codProv, interfaceDTOS);
+            case Constants.SOURCE_VEHICLES:
+                integrateInfoVehicles(codProv, interfaceDTOS);
                 break;
         }
 
@@ -417,11 +417,11 @@ public class ProcesServiceImpl implements ProcesService {
             for (InterfaceDTO interfaceDTO: interfaceDTOS) {
                 PartsDTO p= gson.fromJson(interfaceDTO.getContJson(), PartsDTO.class);
 
-                int validateCustomerExist = validateExistPart(interfaceDTO.getCodExternal(), p.getClaimNumber());
+                int validatePartExist = validateExistPart(interfaceDTO.getCodExternal(), p.getClaimNumber());
 
-                System.out.println("VALOR DE PARTS EXISTE: "+validateCustomerExist);
+                System.out.println("VALOR DE PARTS EXISTE: "+validatePartExist);
 
-                if (validateCustomerExist == 0){
+                if (validatePartExist == 0){
                     partRepository.store(p);
                     interfaceDTO.setUpdateBy("system actualizador nuevo");
                     interfaceDTO.setLastUpdate(currentTimestamp);
@@ -455,11 +455,11 @@ public class ProcesServiceImpl implements ProcesService {
             for (InterfaceDTO interfaceDTO: interfaceDTOS) {
                 VehicleDTO v= gson.fromJson(interfaceDTO.getContJson(), VehicleDTO.class);
 
-                int validateCustomerExist = validateExistVehicle(v.getPlate());
+                int validateVehicleExist = validateExistVehicle(v.getPlate());
 
-                System.out.println("VALOR DE VEHICLE EXISTE: "+validateCustomerExist);
+                System.out.println("VALOR DE VEHICLE EXISTE: "+validateVehicleExist);
 
-                if (validateCustomerExist == 0){
+                if (validateVehicleExist == 0){
                     vehicleRepository.store(v);
                     interfaceDTO.setUpdateBy("system actualizador nuevo");
                     interfaceDTO.setLastUpdate(currentTimestamp);
@@ -588,19 +588,28 @@ public class ProcesServiceImpl implements ProcesService {
     private String getNameFile(String pSource, String codProv, String date, String codProvConsulta) {
 
         String[] fechaActual = LocalDate.now().toString().split("-");
+        String typeOfFile;
+
+        if (pSource.equals("CUSTOMERS")){
+            typeOfFile = customerFile;
+        }else if (pSource.equals("PARTS")){
+            typeOfFile = partsFile;
+        }else {
+            typeOfFile = vehicleFile;
+        }
 
         if ( !date.isEmpty() ) {
             if (codProv.isEmpty()){
-                return relativePath+pathIn+customerFile+codProvConsulta+"_"+date+extension;
+                return relativePath+pathIn+typeOfFile+codProvConsulta+"_"+date+extension;
             }else{
-                return relativePath+pathIn+customerFile+codProv+"_"+date+extension;
+                return relativePath+pathIn+typeOfFile+codProv+"_"+date+extension;
             }
         }
 
         if (codProv.isEmpty()){
-            return relativePath+pathIn+customerFile+codProvConsulta+"_"+fechaActual[0]+fechaActual[1]+fechaActual[2]+extension;
+            return relativePath+pathIn+typeOfFile+codProvConsulta+"_"+fechaActual[0]+fechaActual[1]+fechaActual[2]+extension;
         }else{
-            return relativePath+pathIn+customerFile+codProv+"_"+fechaActual[0]+fechaActual[1]+fechaActual[2]+extension;
+            return relativePath+pathIn+typeOfFile+codProv+"_"+fechaActual[0]+fechaActual[1]+fechaActual[2]+extension;
         }
 
     }
