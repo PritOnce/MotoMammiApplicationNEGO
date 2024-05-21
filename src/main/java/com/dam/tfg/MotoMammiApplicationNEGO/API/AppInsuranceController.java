@@ -1,5 +1,7 @@
 package com.dam.tfg.MotoMammiApplicationNEGO.API;
 
+import com.dam.tfg.MotoMammiApplicationNEGO.models.CustomerDTO;
+import com.dam.tfg.MotoMammiApplicationNEGO.repositories.CustomerRepository;
 import com.dam.tfg.MotoMammiApplicationNEGO.services.ProcesService;
 import com.dam.tfg.MotoMammiApplicationNEGO.utils.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,8 @@ public class AppInsuranceController
 {
     @Autowired
     ProcesService pService;
+    @Autowired
+    CustomerRepository customerRepository;
 
     @RequestMapping(value =("/appInsurance/v1/readInfoFileNEGO/{resource}/{codprov}/{date}"),
             method = RequestMethod.GET,

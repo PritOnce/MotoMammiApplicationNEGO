@@ -65,12 +65,14 @@ foreign key (plate) references MM_CUSTOMER(plate)
 
 CREATE TABLE MM_PARTS (
 id INT PRIMARY KEY AUTO_INCREMENT,
+dni varchar(10) not null,
 claim_number VARCHAR(20) UNIQUE,
 policy_number VARCHAR(20),
 claim_date DATE,
 `description` TEXT,
 `status` VARCHAR(20),
-amount DECIMAL(10, 2)
+amount double,
+foreign key (dni) references mm_customer(dni)
 );
 
 -- Inserts para MM_PROVIDERS

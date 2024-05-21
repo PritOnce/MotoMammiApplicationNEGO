@@ -1,30 +1,28 @@
 package com.dam.tfg.MotoMammiApplicationNEGO.repositories;
 
 import com.dam.tfg.MotoMammiApplicationNEGO.models.CustomerDTO;
-import com.dam.tfg.MotoMammiApplicationNEGO.models.InterfaceDTO;
+import com.dam.tfg.MotoMammiApplicationNEGO.models.VehicleDTO;
 import com.dam.tfg.MotoMammiApplicationNEGO.utils.ConfigDB;
 import org.hibernate.Session;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
-public class CustomerRepository implements ObjectRepository<CustomerDTO> {
+public class VehicleRepository implements ObjectRepository<VehicleDTO> {
     @Override
-    public void storeList(List<CustomerDTO> t) {
+    public void storeList(List<VehicleDTO> t) {
 
     }
 
     @Override
-    public void store(CustomerDTO customerDTO) {
+    public void store(VehicleDTO vehicleDTO) {
         Session session = null;
         try {
             ConfigDB.buildSessionFactory();
             session = ConfigDB.getCurrentSession();
             session.beginTransaction();
-            session.save(customerDTO);
+            session.save(vehicleDTO);
             session.getTransaction().commit();
-            System.out.println("GUARDADO EN LA TABLA CUSTOMER");
+            System.out.println("GUARDADO EN LA TABLA VEHICLE");
         } catch (Exception e) {
             if (session != null && session.getTransaction() != null && session.getTransaction().isActive()) {
                 session.getTransaction().rollback();
@@ -39,16 +37,16 @@ public class CustomerRepository implements ObjectRepository<CustomerDTO> {
     }
 
     @Override
-    public List<CustomerDTO> retrieve() {
+    public List<VehicleDTO> retrieve() {
         return null;
     }
 
     @Override
-    public CustomerDTO search(String dni, String codProv) {
+    public VehicleDTO search(String plate, String codProv) {
         ConfigDB.buildSessionFactory();
-        List<CustomerDTO> customers = (List<CustomerDTO>) ConfigDB.getCurrentSession()
-                .createQuery("from CustomerDTO where dni = :dni")
-                .setParameter("dni", dni).list();
+        List<VehicleDTO> customers = (List<VehicleDTO>) ConfigDB.getCurrentSession()
+                .createQuery("from VehicleDTO where plate = :plate")
+                .setParameter("plate", plate).list();
         if (customers.isEmpty()) {
             return null;
         } else {
@@ -57,17 +55,17 @@ public class CustomerRepository implements ObjectRepository<CustomerDTO> {
     }
 
     @Override
-    public List<CustomerDTO> searchList(String codExternal, String codProv) {
+    public List<VehicleDTO> searchList(String codExternal, String codProv) {
         return null;
     }
 
     @Override
-    public CustomerDTO delete(int id) {
+    public VehicleDTO delete(int id) {
         return null;
     }
 
     @Override
-    public CustomerDTO update(CustomerDTO customerDTO) {
+    public VehicleDTO update(VehicleDTO vehicleDTO) {
         return null;
     }
 }

@@ -74,16 +74,17 @@ public class InterfaceRepository implements ObjectRepository<InterfaceDTO> {
     @Override
     public InterfaceDTO search(String codExternal, String codProv) {
         ConfigDB.buildSessionFactory();
-        List<InterfaceDTO> interfaces = (List<InterfaceDTO>) ConfigDB.getCurrentSession()
+        InterfaceDTO interfaceDTO = (InterfaceDTO) ConfigDB.getCurrentSession()
                 .createQuery("from InterfaceDTO where codExternal = :codigoExterno " +
-                        "and codProv = :codigoProveedor")
-                .setParameter("codigoExterno", codExternal).setParameter("codigoProveedor", codProv).list();
-        if (interfaces.isEmpty()) {
-            return null;
-        } else {
-            return interfaces.get(0); // Return the first matching result
-        }
+                        "and codProv = :codigoProveedor " +
+                        "order by creationDate desc") // Suponiendo que tienes un campo fechaCreacion para ordenar
+                .setParameter("codigoExterno", codExternal)
+                .setParameter("codigoProveedor", codProv)
+                .setMaxResults(1)
+                .uniqueResult();
+        return interfaceDTO;
     }
+
 
     @Override
     public List<InterfaceDTO> searchList(String codExternal, String codProv) {
