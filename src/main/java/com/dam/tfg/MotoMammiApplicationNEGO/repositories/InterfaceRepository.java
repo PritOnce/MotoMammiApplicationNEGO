@@ -72,14 +72,15 @@ public class InterfaceRepository implements ObjectRepository<InterfaceDTO> {
     }
 
     @Override
-    public InterfaceDTO search(String codExternal, String codProv) {
+    public InterfaceDTO search(String codExternal, String codProv, String pSource) {
         ConfigDB.buildSessionFactory();
         InterfaceDTO interfaceDTO = (InterfaceDTO) ConfigDB.getCurrentSession()
                 .createQuery("from InterfaceDTO where codExternal = :codigoExterno " +
-                        "and codProv = :codigoProveedor " +
+                        "and codProv = :codigoProveedor and resource = :pSource " +
                         "order by creationDate desc") // Suponiendo que tienes un campo fechaCreacion para ordenar
                 .setParameter("codigoExterno", codExternal)
                 .setParameter("codigoProveedor", codProv)
+                .setParameter("pSource", pSource)
                 .setMaxResults(1)
                 .uniqueResult();
         return interfaceDTO;
@@ -109,7 +110,10 @@ public class InterfaceRepository implements ObjectRepository<InterfaceDTO> {
             session.beginTransaction();
 
             // Obtener la entidad desde la base de datos usando el ID
-            InterfaceDTO existingEntity = (InterfaceDTO) session.get(InterfaceDTO.class, interfaceDTO.getId());
+//            InterfaceDTO existingEntity = (InterfaceDTO) session.get(InterfaceDTO.class, interfaceDTO.getCodExternal());
+            InterfaceDTO existingEntity = (InterfaceDTO) session.createQuery("FROM InterfaceDTO WHERE codExternal = :codExternal")
+                    .setParameter("codExternal", interfaceDTO.getCodExternal())
+                    .uniqueResult();
 
             // Verificar si la entidad existe
             if (existingEntity != null) {
@@ -122,7 +126,7 @@ public class InterfaceRepository implements ObjectRepository<InterfaceDTO> {
                 return existingEntity;
             } else {
                 // Si la entidad no existe, lanzar una excepción
-                throw new EntityNotFoundException("La entidad con ID " + interfaceDTO.getId() + " no fue encontrada.");
+                throw new EntityNotFoundException("La entidad con ID " + interfaceDTO.getCodExternal() + " no fue encontrada.");
             }
         } catch (Exception e) {
             if (session != null && session.getTransaction() != null && session.getTransaction().isActive()) {

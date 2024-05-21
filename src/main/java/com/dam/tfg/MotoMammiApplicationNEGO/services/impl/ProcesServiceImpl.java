@@ -86,8 +86,7 @@ public class ProcesServiceImpl implements ProcesService {
                         list.add(linea);
                     }
 
-
-
+                    br.close();
                     switch (pSource){
                         case Constants.SOURCE_CUSTOMER:
                             serDataInterfaceCustomer(list, codigoProveedor, pSource);
@@ -159,7 +158,7 @@ public class ProcesServiceImpl implements ProcesService {
                 interfaceDTO.setOperation("NEW");
                 interfaceDTO.setResource(pSource);
 
-                int valid = validateInfo(interfaceDTO, json);
+                int valid = validateInfo(interfaceDTO, json, Constants.SOURCE_CUSTOMER);
                 System.out.println("VALOR DE VALID: " + valid);
                 if(valid == 0){
                     interfaceRepository.store(interfaceDTO);
@@ -229,7 +228,7 @@ public class ProcesServiceImpl implements ProcesService {
                 interfaceDTO.setOperation("NEW");
                 interfaceDTO.setResource(pSource);
 
-                int valid = validateInfo(interfaceDTO, json);
+                int valid = validateInfo(interfaceDTO, json, Constants.SOURCE_VEHICLES);
                 System.out.println("VALOR DE VALID: " + valid);
                 if(valid == 0){
                     interfaceRepository.store(interfaceDTO);
@@ -293,7 +292,7 @@ public class ProcesServiceImpl implements ProcesService {
 
 
                 // Establecer los valores de InterfaceDTO según sea necesario
-                interfaceDTO.setCodExternal(datos[0]);
+                interfaceDTO.setCodExternal(datos[1]);
                 interfaceDTO.setCodProv(codProv);
                 interfaceDTO.setContJson(json);
                 interfaceDTO.setCreationDate(currentTimestamp);
@@ -306,7 +305,7 @@ public class ProcesServiceImpl implements ProcesService {
                 interfaceDTO.setOperation("NEW");
                 interfaceDTO.setResource(pSource);
 
-                int valid = validateInfo(interfaceDTO, json);
+                int valid = validateInfo(interfaceDTO, json, Constants.SOURCE_PARTS);
                 System.out.println("VALOR DE VALID: " + valid);
                 if(valid == 0){
                     interfaceRepository.store(interfaceDTO);
@@ -417,7 +416,7 @@ public class ProcesServiceImpl implements ProcesService {
             for (InterfaceDTO interfaceDTO: interfaceDTOS) {
                 PartsDTO p= gson.fromJson(interfaceDTO.getContJson(), PartsDTO.class);
 
-                int validatePartExist = validateExistPart(interfaceDTO.getCodExternal(), p.getClaimNumber());
+                int validatePartExist = validateExistPart(p.getDni(), p.getClaimNumber());
 
                 System.out.println("VALOR DE PARTS EXISTE: "+validatePartExist);
 
@@ -486,7 +485,7 @@ public class ProcesServiceImpl implements ProcesService {
     }
 
     private int validateExistCustomer(String dni) {
-        CustomerDTO customerDTO = customerRepository.search(dni, "");
+        CustomerDTO customerDTO = customerRepository.search(dni, "", "");
         if(customerDTO == null){
             return 0;
         }else {
@@ -495,7 +494,7 @@ public class ProcesServiceImpl implements ProcesService {
     }
 
     private int validateExistPart(String dni, String claimNumber) {
-        PartsDTO partsDTO = partRepository.search(dni, claimNumber);
+        PartsDTO partsDTO = partRepository.search(dni, claimNumber, "");
         if(partsDTO == null){
             return 0;
         }else {
@@ -504,7 +503,7 @@ public class ProcesServiceImpl implements ProcesService {
     }
 
     private int validateExistVehicle(String plate) {
-        VehicleDTO vehicleDTO = vehicleRepository.search(plate, "");
+        VehicleDTO vehicleDTO = vehicleRepository.search(plate, "", "");
         if (vehicleDTO == null){
             return 0;
         }else {
@@ -512,9 +511,9 @@ public class ProcesServiceImpl implements ProcesService {
         }
     }
 
-    private int validateInfo(InterfaceDTO interfaceDTO, String json) {
+    private int validateInfo(InterfaceDTO interfaceDTO, String json, String pSource) {
 
-        InterfaceDTO interfaceData = interfaceRepository.search(interfaceDTO.getCodExternal(), interfaceDTO.getCodProv());
+        InterfaceDTO interfaceData = interfaceRepository.search(interfaceDTO.getCodExternal(), interfaceDTO.getCodProv(), pSource);
 
         if(interfaceData == null){
             return 0;

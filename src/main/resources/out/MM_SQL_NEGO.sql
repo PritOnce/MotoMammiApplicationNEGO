@@ -71,14 +71,13 @@ policy_number VARCHAR(20),
 claim_date DATE,
 `description` TEXT,
 `status` VARCHAR(20),
-amount double,
-foreign key (dni) references mm_customer(dni)
+amount double
 );
 
 -- Inserts para MM_PROVIDERS
 INSERT INTO MM_PROVIDERS (codProv, name, dateIni, dateEnd, SwiAct) VALUES
 ('CAX', 'La Caixa', '2024/01/10', '2024/11/19', true),
-('ING', 'Banco ING', '2023/05/23', '2024/05/23', true),
+('ING', 'Banco ING', '2023/05/23', '2024/05/30', true),
 ('COL', 'COLONIA', '2022/04/07', '2024/03/18', true),
 ('BBVA', 'Banco BBVA', '2024/03/13', '2025/01/10', false);
 

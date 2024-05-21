@@ -43,15 +43,15 @@ public class VehicleRepository implements ObjectRepository<VehicleDTO> {
     }
 
     @Override
-    public VehicleDTO search(String plate, String codProv) {
+    public VehicleDTO search(String plate, String codProv, String pSource) {
         ConfigDB.buildSessionFactory();
-        List<VehicleDTO> customers = (List<VehicleDTO>) ConfigDB.getCurrentSession()
+        List<VehicleDTO> vehicle = (List<VehicleDTO>) ConfigDB.getCurrentSession()
                 .createQuery("from VehicleDTO where plate = :plate")
                 .setParameter("plate", plate).list();
-        if (customers.isEmpty()) {
+        if (vehicle.isEmpty()) {
             return null;
         } else {
-            return customers.get(0); // Return the first matching result
+            return vehicle.get(0); // Return the first matching result
         }
     }
 

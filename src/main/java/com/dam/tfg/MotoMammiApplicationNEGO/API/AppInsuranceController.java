@@ -15,8 +15,6 @@ public class AppInsuranceController
 {
     @Autowired
     ProcesService pService;
-    @Autowired
-    CustomerRepository customerRepository;
 
     @RequestMapping(value =("/appInsurance/v1/readInfoFileNEGO/{resource}/{codprov}/{date}"),
             method = RequestMethod.GET,
@@ -32,6 +30,27 @@ public class AppInsuranceController
         try{
             System.out.println("\nEsta tarea se lanza cada 15 segundos");
             pService.readFileInfo(resource,codprov,date);
+
+        } catch (Exception e){
+            System.err.println("heey pero me estoy poniendo peluche yo 😏😏");
+        }
+        System.out.println("El valor de resource es: "+resource);
+        return "Buenos dias";
+    }
+
+    @RequestMapping(value =("/appInsurance/v1/integrateInfoNEGO/{resource}/{codprov}/{date}"),
+            method = RequestMethod.GET,
+            produces = "application/json")
+    String callIntegrateInfo(@PathVariable String resource,
+                               @PathVariable String codprov,
+                               @PathVariable String date//"20240423"
+    ){
+        if (resource.isEmpty()){
+            return "ERROR: El resource es obligatorio";
+        }
+
+        try{
+            System.out.println("\nEsta tarea se lanza cada 15 segundos");
             pService.integrateInfo(resource,codprov);
 
         } catch (Exception e){

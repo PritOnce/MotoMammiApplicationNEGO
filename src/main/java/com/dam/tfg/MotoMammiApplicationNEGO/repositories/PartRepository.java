@@ -44,10 +44,10 @@ public class PartRepository implements ObjectRepository<PartsDTO> {
     }
 
     @Override
-    public PartsDTO search(String dni, String claimNumber) {
+    public PartsDTO search(String dni, String claimNumber, String pSource) {
         ConfigDB.buildSessionFactory();
         List<PartsDTO> partsDTOS = (List<PartsDTO>) ConfigDB.getCurrentSession()
-                .createQuery("from PartsDTO where dni = :dni and claim_number = :claimNumber")
+                .createQuery("from PartsDTO where dni = :dni and claim_number = :claim_number")
                 .setParameter("dni", dni)
                 .setParameter("claim_number", claimNumber).list();
         if (partsDTOS.isEmpty()) {

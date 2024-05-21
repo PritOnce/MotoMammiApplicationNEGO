@@ -44,7 +44,7 @@ public class CustomerRepository implements ObjectRepository<CustomerDTO> {
     }
 
     @Override
-    public CustomerDTO search(String dni, String codProv) {
+    public CustomerDTO search(String dni, String codProv, String pSource) {
         ConfigDB.buildSessionFactory();
         List<CustomerDTO> customers = (List<CustomerDTO>) ConfigDB.getCurrentSession()
                 .createQuery("from CustomerDTO where dni = :dni")
