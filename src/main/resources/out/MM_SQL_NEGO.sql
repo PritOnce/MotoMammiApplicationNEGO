@@ -74,6 +74,31 @@ claim_date DATE,
 amount double
 );
 
+CREATE TABLE MM_INVOICES (
+id INT PRIMARY KEY AUTO_INCREMENT,
+invoice_number VARCHAR(20) NOT NULL UNIQUE,
+dni VARCHAR(10),
+codProv VARCHAR(100),
+plate VARCHAR(10),
+issue_date DATE, -- Fecha en que se emite la factura.
+company_name VARCHAR(100),
+company_cif VARCHAR(12),
+company_address VARCHAR(100),
+user_name VARCHAR(50),
+user_first_surname VARCHAR(50),
+user_last_surname VARCHAR(50),
+user_address VARCHAR(100),
+insurance_type VARCHAR(50),
+vehicle_type VARCHAR(30),
+registration_date DATE,
+contract_end_date DATE,
+cost DOUBLE, -- Coste del seguro antes de impuestos.
+vat DOUBLE, -- IVA
+FOREIGN KEY (dni) REFERENCES MM_CUSTOMER(dni),
+FOREIGN KEY (codProv) REFERENCES MM_PROVIDERS(codProv),
+FOREIGN KEY (plate) REFERENCES MM_VEHICLES(plate)
+);
+
 -- Inserts para MM_PROVIDERS
 INSERT INTO MM_PROVIDERS (codProv, name, dateIni, dateEnd, SwiAct) VALUES
 ('CAX', 'La Caixa', '2024/01/10', '2024/11/19', true),
