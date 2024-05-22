@@ -92,7 +92,7 @@ public class InterfaceRepository implements ObjectRepository<InterfaceDTO> {
         ConfigDB.buildSessionFactory();
         List<InterfaceDTO> interfaces = (List<InterfaceDTO>) ConfigDB.getCurrentSession()
                 .createQuery("from InterfaceDTO where codExternal = :codigoExterno " +
-                        "and codProv = :codigoProveedor")
+                        "and codProv = :codigoProveedor order by creationDate desc")
                 .setParameter("codigoExterno", codExternal).setParameter("codigoProveedor", codProv).list();
         return interfaces;
     }
@@ -113,7 +113,7 @@ public class InterfaceRepository implements ObjectRepository<InterfaceDTO> {
 //            InterfaceDTO existingEntity = (InterfaceDTO) session.get(InterfaceDTO.class, interfaceDTO.getCodExternal());
             InterfaceDTO existingEntity = (InterfaceDTO) session.createQuery("FROM InterfaceDTO WHERE codExternal = :codExternal")
                     .setParameter("codExternal", interfaceDTO.getCodExternal())
-                    .uniqueResult();
+                    .list().get(0);
 
             // Verificar si la entidad existe
             if (existingEntity != null) {
