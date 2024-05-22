@@ -81,19 +81,8 @@ dni VARCHAR(10),
 codProv VARCHAR(100),
 plate VARCHAR(10),
 issue_date DATE, -- Fecha en que se emite la factura.
-company_name VARCHAR(100),
-company_cif VARCHAR(12),
-company_address VARCHAR(100),
-user_name VARCHAR(50),
-user_first_surname VARCHAR(50),
-user_last_surname VARCHAR(50),
-user_address VARCHAR(100),
-insurance_type VARCHAR(50),
-vehicle_type VARCHAR(30),
-registration_date DATE,
-contract_end_date DATE,
 cost DOUBLE, -- Coste del seguro antes de impuestos.
-vat DOUBLE, -- IVA
+send boolean default false,
 FOREIGN KEY (dni) REFERENCES MM_CUSTOMER(dni),
 FOREIGN KEY (codProv) REFERENCES MM_PROVIDERS(codProv),
 FOREIGN KEY (plate) REFERENCES MM_VEHICLES(plate)
@@ -108,15 +97,18 @@ INSERT INTO MM_PROVIDERS (codProv, name, dateIni, dateEnd, SwiAct) VALUES
 
 -- Inserts para MM_TRANSLATIONS
 INSERT INTO MM_TRANSLATIONS (codProv, internalCode, externalCode, dateIni, dateEnd) VALUES
-('CAX', 'C/', 'Car', '2024/03/13', NULL),
-('CAX','AV', 'Aven', '2024/03/13', NULL),
-('CAX','PL', 'Plz', '2024/03/13', NULL),
-('ING','C/', 'Calle', '2024/03/13', NULL),
-('ING','AV', 'Avenida', '2024/03/13', NULL),
-('ING','PL', 'P.', '2024/03/13', NULL),
-('COL','C/', 'Carrer', '2024/03/13', NULL),
-('COL','AV', 'Avenguda', '2024/03/13', NULL),
-('COL','PL', 'Plaça', '2024/03/13', NULL),
-('BBVA','C/', 'Camino', '2024/03/13', NULL),
-('BBVA','AV', 'Avend', '2024/03/13', NULL),
-('BBVA','PL', 'P/', '2024/03/13', NULL);
+('CAX', 'C/', 'Car', '2024/03/13', '2099/12/31'),
+('CAX','AV', 'Aven', '2024/03/13', '2099/12/31'),
+('CAX','PL', 'Plz', '2024/03/13', '2099/12/31'),
+('ING','C/', 'Calle', '2024/03/13', '2099/12/31'),
+('ING','AV', 'Avenida', '2024/03/13', '2099/12/31'),
+('ING','PL', 'P.', '2024/03/13', '2099/12/31'),
+('COL','C/', 'Carrer', '2024/03/13', '2099/12/31'),
+('COL','AV', 'Avenguda', '2024/03/13', '2099/12/31'),
+('COL','PL', 'Plaça', '2024/03/13', '2099/12/31'),
+('BBVA','C/', 'Camino', '2024/03/13', '2099/12/31'),
+('BBVA','AV', 'Avend', '2024/03/13', '2099/12/31'),
+('BBVA','PL', 'P/', '2024/03/13', '2099/12/31');
+
+SELECT c.dni,c.nombre,c.ap1,v.model,v.plate, i.cost,i.invoice_number* 
+FROM mm_nego.mm_invoices i, mm_nego.mm_customer c, mm_nego.mm_vehicles v ;

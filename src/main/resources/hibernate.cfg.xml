@@ -5,8 +5,8 @@
         <property name="connection.driver_class">com.mysql.jdbc.Driver</property>
         <property name="connection.url">jdbc:mysql://localhost:3306/mm_nego</property>
         <property name="connection.username">root</property>
-        <!--<property name="connection.password">familiaonce112004</property>-->
-        <property name="connection.password">root</property>
+        <property name="connection.password">familiaonce112004</property>
+<!--        <property name="connection.password">root</property>-->
         <property name="dialect">org.hibernate.dialect.MySQL5Dialect</property>
         <property name="hibernate.show_sql">true</property>
 
@@ -15,6 +15,7 @@
         <mapping class="com.dam.tfg.MotoMammiApplicationNEGO.models.CustomerDTO" />
         <mapping class="com.dam.tfg.MotoMammiApplicationNEGO.models.VehicleDTO" />
         <mapping class="com.dam.tfg.MotoMammiApplicationNEGO.models.PartsDTO" />
+        <mapping class="com.dam.tfg.MotoMammiApplicationNEGO.models.TranslationDTO" />
 
     </session-factory>
 </hibernate-configuration>

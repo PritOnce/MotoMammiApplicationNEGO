@@ -59,4 +59,21 @@ public class AppInsuranceController
         System.out.println("El valor de resource es: "+resource);
         return "Buenos dias";
     }
+
+    @RequestMapping(value =("/appInsurance/v1/genInvoiceFileNEGO/{codprov}/{date}"),
+            method = RequestMethod.GET,
+            produces = "application/json")
+    String genInvoiceFile(@PathVariable String codprov,
+                          @PathVariable String date//"20240423"
+    ){
+
+        try{
+            System.out.println("\nEsta tarea se lanza cada 15 segundos");
+            pService.genInvoiceFile(codprov, date);
+
+        } catch (Exception e){
+            System.err.println("heey pero me estoy poniendo peluche yo 😏😏");
+        }
+        return "Buenos dias";
+    }
 }

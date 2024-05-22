@@ -47,6 +47,8 @@ public class ProcesServiceImpl implements ProcesService {
     PartRepository partRepository;
     @Autowired
     VehicleRepository vehicleRepository;
+    @Autowired
+    TranslationRepository translationRepository;
 
     CustomerDTO customerDTO = new CustomerDTO();
     VehicleDTO vehicleDTO = new VehicleDTO();
@@ -358,6 +360,11 @@ public class ProcesServiceImpl implements ProcesService {
 
     }
 
+    @Override
+    public void genInvoiceFile(String pSource, String codProv) {
+
+    }
+
     private void integrateInfoCustomer(String codProv, List<InterfaceDTO> interfaceDTOS) {
         Gson gson = new Gson();
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
@@ -484,6 +491,8 @@ public class ProcesServiceImpl implements ProcesService {
         }
     }
 
+
+
     private int validateExistCustomer(String dni) {
         CustomerDTO customerDTO = customerRepository.search(dni, "", "");
         if(customerDTO == null){
@@ -526,62 +535,11 @@ public class ProcesServiceImpl implements ProcesService {
 
     private String fncTranslate(String streetType, String codProv) {
 
-        switch (codProv) {
-            case "CAX" -> {
-                switch (streetType) {
-                    case "Car":
-                        streetType = "C/";
-                        break;
-                    case "Aven":
-                        streetType = "AV";
-                        break;
-                    case "Plz":
-                        streetType = "PL";
-                        break;
-                }
-            }
-            case "ING" -> {
-                switch (streetType) {
-                    case "Calle":
-                        streetType = "C/";
-                        break;
-                    case "Avenida":
-                        streetType = "AV";
-                        break;
-                    case "P.":
-                        streetType = "PL";
-                        break;
-                }
-            }
-            case "BBVA" -> {
-                switch (streetType) {
-                    case "Camino":
-                        streetType = "C/";
-                        break;
-                    case "Avend":
-                        streetType = "AV";
-                        break;
-                    case "P/":
-                        streetType = "PL";
-                        break;
-                }
-            }
-            case "COL" -> {
-                switch (streetType) {
-                    case "Carrer":
-                        streetType = "C/";
-                        break;
-                    case "Avenguda":
-                        streetType = "AV";
-                        break;
-                    case "Plaça":
-                        streetType = "PL";
-                        break;
-                }
-            }
-        }
+        TranslationDTO translationDTO = translationRepository.search(codProv, streetType, "");
+        streetType = translationDTO.getInternalCode();
 
         return streetType;
+
     }
 
     private String getNameFile(String pSource, String codProv, String date, String codProvConsulta) {
