@@ -17,6 +17,12 @@ public class PartRepository implements ObjectRepository<PartsDTO> {
 
     @Override
     public void store(PartsDTO partsDTO) {
+
+        CustomerRepository customerRepository = new CustomerRepository();
+        if (customerRepository.searchDNI(partsDTO.getDni())) {
+            throw new IllegalArgumentException("El cliente no existe");
+        }
+
         Session session = null;
         try {
             ConfigDB.buildSessionFactory();
@@ -39,23 +45,44 @@ public class PartRepository implements ObjectRepository<PartsDTO> {
     }
 
     @Override
-    public List<PartsDTO> retrieve() {
+    public List<PartsDTO> retrieve(String pSource, String date) {
         return null;
     }
 
     @Override
     public PartsDTO search(String dni, String claimNumber, String pSource) {
-        ConfigDB.buildSessionFactory();
-        List<PartsDTO> partsDTOS = (List<PartsDTO>) ConfigDB.getCurrentSession()
-                .createQuery("from PartsDTO where dni = :dni and claim_number = :claim_number")
-                .setParameter("dni", dni)
-                .setParameter("claim_number", claimNumber).list();
-        if (partsDTOS.isEmpty()) {
-            return null;
-        } else {
-            return partsDTOS.get(0); // Return the first matching result
+        Session session = null;
+        try {
+            ConfigDB.buildSessionFactory();
+            session = ConfigDB.getCurrentSession();
+            session.beginTransaction();
+
+            List<PartsDTO> partsDTOS = session.createQuery("from PartsDTO where dni = :dni and claim_number = :claim_number")
+                    .setParameter("dni", dni)
+                    .setParameter("claim_number", claimNumber)
+                    .list();
+
+            session.getTransaction().commit();
+
+            if (partsDTOS.isEmpty()) {
+                return null;
+            } else {
+                return partsDTOS.get(0); // Return the first matching result
+            }
+        } catch (Exception e) {
+            if (session != null) {
+                session.getTransaction().rollback();
+            }
+            System.out.println("Error al buscar en la base de datos en la  tabla PART");
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
+        return null;
     }
+
 
     @Override
     public List<PartsDTO> searchList(String codExternal, String codProv) {

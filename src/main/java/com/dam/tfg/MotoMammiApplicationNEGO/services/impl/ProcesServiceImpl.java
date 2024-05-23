@@ -49,6 +49,8 @@ public class ProcesServiceImpl implements ProcesService {
     VehicleRepository vehicleRepository;
     @Autowired
     TranslationRepository translationRepository;
+    @Autowired
+    InvoicesRepository invoicesRepository;
 
     CustomerDTO customerDTO = new CustomerDTO();
     VehicleDTO vehicleDTO = new VehicleDTO();
@@ -57,7 +59,7 @@ public class ProcesServiceImpl implements ProcesService {
     public void readFileInfo(String pSource, String codProv, String date) {
         try {
             System.out.println("HORA ACTUAL CADA 15 SEGUNDOS: " + dateFormat.format(new Date()) + " pSoruce: " + pSource);
-            List<ProvidersDTO> proveedor = providerRepository.retrieve();
+            List<ProvidersDTO> proveedor = providerRepository.retrieve("", "");
             for (ProvidersDTO prov: proveedor) {
                 System.out.println(prov.getId() + " " + prov.getCodProv() + " " + prov.getName() + " " + prov.getDateIni() + " " +
                         prov.getDateEnd() + " " + prov.isSwiAct() + " " + LocalDate.now());
@@ -345,7 +347,7 @@ public class ProcesServiceImpl implements ProcesService {
     @Override
     public void integrateInfo(String pSource, String codProv) {
 
-        List<InterfaceDTO> interfaceDTOS = interfaceRepository.retrieve();
+        List<InterfaceDTO> interfaceDTOS = interfaceRepository.retrieve(pSource, "");
         switch (pSource) {
             case Constants.SOURCE_CUSTOMER:
                 integrateInfoCustomer(codProv, interfaceDTOS);
@@ -360,58 +362,45 @@ public class ProcesServiceImpl implements ProcesService {
 
     }
 
-    @Override
-    public void genInvoiceFile(String pSource, String codProv) {
-
-    }
-
     private void integrateInfoCustomer(String codProv, List<InterfaceDTO> interfaceDTOS) {
         Gson gson = new Gson();
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
-        try {
-            for (InterfaceDTO interfaceDTO: interfaceDTOS) {
-                CustomerDTO c= gson.fromJson(interfaceDTO.getContJson(), CustomerDTO.class);
+        for (InterfaceDTO interfaceDTO : interfaceDTOS) {
+            try {
+                CustomerDTO c = gson.fromJson(interfaceDTO.getContJson(), CustomerDTO.class);
+                int validateCustomerExist = validateExistCustomer(c.getDni());
+                System.out.println("VALOR DE CUSTOMER EXISTE: " + validateCustomerExist);
 
-                int validateCustomerExist = validateExistCustomer(interfaceDTO.getCodExternal());
-
-                System.out.println("VALOR DE CUSTOMRE EXISTE: "+validateCustomerExist);
-
-                if (validateCustomerExist == 0){
-                    if (codProv.isEmpty()){
-                        String traducido = fncTranslate(c.getStreetType(),interfaceDTO.getCodProv());
-                        c.setStreetType(traducido);
-                        customerRepository.store(c);
-                        interfaceDTO.setUpdateBy("system actualizador nuevo");
-                        interfaceDTO.setLastUpdate(currentTimestamp);
-                        interfaceDTO.setStatusProcess("P");
-                        interfaceRepository.update(interfaceDTO);
-                    }else {
-                        String traducido = fncTranslate(c.getStreetType(),codProv);
-                        c.setStreetType(traducido);
-                        customerRepository.store(c);
-                        interfaceDTO.setUpdateBy("system actualizador nuevo");
-                        interfaceDTO.setLastUpdate(currentTimestamp);
-                        interfaceDTO.setStatusProcess("P");
-                        interfaceRepository.update(interfaceDTO);
-                    }
-                }else {
-                    interfaceDTO.setUpdateBy("system actualizador existente");
-                    interfaceDTO.setLastUpdate(currentTimestamp);
-                    interfaceDTO.setStatusProcess("P");
-                    interfaceRepository.update(interfaceDTO);
+                if(codProv.isEmpty()){
+                    codProv = interfaceDTO.getCodProv();
                 }
 
+                if (validateCustomerExist == 0) {
+                    String traducido = fncTranslate(c.getStreetType(),codProv);
+                    c.setStreetType(traducido);
+                    customerRepository.store(c);
+                    interfaceDTO.setUpdateBy("system actualizador nuevo");
+                } else {
+                    interfaceDTO.setUpdateBy("system actualizador existente");
+                }
+                interfaceDTO.setLastUpdate(currentTimestamp);
+                interfaceDTO.setCodError(null);
+                interfaceDTO.setErrorMessage(null);
+                interfaceDTO.setStatusProcess("P");
+                interfaceRepository.update(interfaceDTO);
+            } catch (Exception e) {
+                InterfaceDTO errorInterfaceDTO = new InterfaceDTO();
+                errorInterfaceDTO.setCodExternal(interfaceDTO.getCodExternal());
+                errorInterfaceDTO.setUpdateBy("system");
+                errorInterfaceDTO.setLastUpdate(currentTimestamp);
+                errorInterfaceDTO.setCodError("240-Customer");
+                errorInterfaceDTO.setErrorMessage(e.getMessage());
+                errorInterfaceDTO.setStatusProcess("E");
+                errorInterfaceDTO.setOperation("UPDATE");
+                interfaceRepository.update(errorInterfaceDTO);
             }
-        }catch (Exception e){
-        InterfaceDTO interfaceDTO = new InterfaceDTO();
-        interfaceDTO.setUpdateBy("system");
-        interfaceDTO.setLastUpdate(currentTimestamp);
-        interfaceDTO.setCodError("240-Customer");
-        interfaceDTO.setErrorMessage(e.getMessage());
-        interfaceDTO.setStatusProcess("E");
-        interfaceRepository.update(interfaceDTO);
-    }
+        }
 
     }
 
@@ -419,37 +408,34 @@ public class ProcesServiceImpl implements ProcesService {
         Gson gson = new Gson();
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
-        try {
-            for (InterfaceDTO interfaceDTO: interfaceDTOS) {
-                PartsDTO p= gson.fromJson(interfaceDTO.getContJson(), PartsDTO.class);
-
+        for (InterfaceDTO interfaceDTO : interfaceDTOS) {
+            try {
+                PartsDTO p = gson.fromJson(interfaceDTO.getContJson(), PartsDTO.class);
                 int validatePartExist = validateExistPart(p.getDni(), p.getClaimNumber());
+                System.out.println("VALOR DE PART EXISTE: " + validatePartExist);
 
-                System.out.println("VALOR DE PARTS EXISTE: "+validatePartExist);
-
-                if (validatePartExist == 0){
+                if (validatePartExist == 0) {
                     partRepository.store(p);
                     interfaceDTO.setUpdateBy("system actualizador nuevo");
-                    interfaceDTO.setLastUpdate(currentTimestamp);
-                    interfaceDTO.setStatusProcess("P");
-                    interfaceRepository.update(interfaceDTO);
-
-                }else {
+                } else {
                     interfaceDTO.setUpdateBy("system actualizador existente");
-                    interfaceDTO.setLastUpdate(currentTimestamp);
-                    interfaceDTO.setStatusProcess("P");
-                    interfaceRepository.update(interfaceDTO);
                 }
-
+                interfaceDTO.setLastUpdate(currentTimestamp);
+                interfaceDTO.setCodError(null);
+                interfaceDTO.setErrorMessage(null);
+                interfaceDTO.setStatusProcess("P");
+                interfaceRepository.update(interfaceDTO);
+            } catch (Exception e) {
+                InterfaceDTO errorInterfaceDTO = new InterfaceDTO();
+                errorInterfaceDTO.setCodExternal(interfaceDTO.getCodExternal());
+                errorInterfaceDTO.setUpdateBy("system");
+                errorInterfaceDTO.setLastUpdate(currentTimestamp);
+                errorInterfaceDTO.setCodError("240-Parts");
+                errorInterfaceDTO.setErrorMessage(e.getMessage());
+                errorInterfaceDTO.setStatusProcess("E");
+                errorInterfaceDTO.setOperation("UPDATE");
+                interfaceRepository.update(errorInterfaceDTO);
             }
-        }catch (Exception e) {
-            InterfaceDTO interfaceDTO = new InterfaceDTO();
-            interfaceDTO.setUpdateBy("system");
-            interfaceDTO.setLastUpdate(currentTimestamp);
-            interfaceDTO.setCodError("240-Part");
-            interfaceDTO.setErrorMessage(e.getMessage());
-            interfaceDTO.setStatusProcess("E");
-            interfaceRepository.update(interfaceDTO);
         }
     }
 
@@ -457,41 +443,42 @@ public class ProcesServiceImpl implements ProcesService {
         Gson gson = new Gson();
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
-        try {
-            for (InterfaceDTO interfaceDTO: interfaceDTOS) {
-                VehicleDTO v= gson.fromJson(interfaceDTO.getContJson(), VehicleDTO.class);
-
+        for (InterfaceDTO interfaceDTO : interfaceDTOS) {
+            try {
+                VehicleDTO v = gson.fromJson(interfaceDTO.getContJson(), VehicleDTO.class);
                 int validateVehicleExist = validateExistVehicle(v.getPlate());
+                System.out.println("VALOR DE VEHICLE EXISTE: " + validateVehicleExist);
 
-                System.out.println("VALOR DE VEHICLE EXISTE: "+validateVehicleExist);
-
-                if (validateVehicleExist == 0){
+                if (validateVehicleExist == 0) {
                     vehicleRepository.store(v);
                     interfaceDTO.setUpdateBy("system actualizador nuevo");
-                    interfaceDTO.setLastUpdate(currentTimestamp);
-                    interfaceDTO.setStatusProcess("P");
-                    interfaceRepository.update(interfaceDTO);
-
-                }else {
+                } else {
                     interfaceDTO.setUpdateBy("system actualizador existente");
-                    interfaceDTO.setLastUpdate(currentTimestamp);
-                    interfaceDTO.setStatusProcess("P");
-                    interfaceRepository.update(interfaceDTO);
                 }
-
+                interfaceDTO.setLastUpdate(currentTimestamp);
+                interfaceDTO.setCodError(null);
+                interfaceDTO.setErrorMessage(null);
+                interfaceDTO.setStatusProcess("P");
+                interfaceRepository.update(interfaceDTO);
+            } catch (Exception e) {
+                InterfaceDTO errorInterfaceDTO = new InterfaceDTO();
+                errorInterfaceDTO.setCodExternal(interfaceDTO.getCodExternal());
+                errorInterfaceDTO.setUpdateBy("system");
+                errorInterfaceDTO.setLastUpdate(currentTimestamp);
+                errorInterfaceDTO.setCodError("240-Vehicle");
+                errorInterfaceDTO.setErrorMessage(e.getMessage());
+                errorInterfaceDTO.setStatusProcess("E");
+                errorInterfaceDTO.setOperation("UPDATE");
+                interfaceRepository.update(errorInterfaceDTO);
             }
-        }catch (Exception e) {
-            InterfaceDTO interfaceDTO = new InterfaceDTO();
-            interfaceDTO.setUpdateBy("system");
-            interfaceDTO.setLastUpdate(currentTimestamp);
-            interfaceDTO.setCodError("240-Vehicle");
-            interfaceDTO.setErrorMessage(e.getMessage());
-            interfaceDTO.setStatusProcess("E");
-            interfaceRepository.update(interfaceDTO);
         }
     }
 
 
+    @Override
+    public void genInvoiceFile(String codProv, String date) {
+        List<InvoicesDTO> invoicesDTO = invoicesRepository.retrieve(codProv, date);
+    }
 
     private int validateExistCustomer(String dni) {
         CustomerDTO customerDTO = customerRepository.search(dni, "", "");

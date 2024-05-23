@@ -2,6 +2,7 @@ package com.dam.tfg.MotoMammiApplicationNEGO.repositories;
 
 import com.dam.tfg.MotoMammiApplicationNEGO.models.CustomerDTO;
 import com.dam.tfg.MotoMammiApplicationNEGO.models.InterfaceDTO;
+import com.dam.tfg.MotoMammiApplicationNEGO.models.PartsDTO;
 import com.dam.tfg.MotoMammiApplicationNEGO.utils.ConfigDB;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
@@ -39,21 +40,43 @@ public class CustomerRepository implements ObjectRepository<CustomerDTO> {
     }
 
     @Override
-    public List<CustomerDTO> retrieve() {
+    public List<CustomerDTO> retrieve(String pSource, String date) {
         return null;
     }
 
     @Override
     public CustomerDTO search(String dni, String codProv, String pSource) {
-        ConfigDB.buildSessionFactory();
-        List<CustomerDTO> customers = (List<CustomerDTO>) ConfigDB.getCurrentSession()
-                .createQuery("from CustomerDTO where dni = :dni")
-                .setParameter("dni", dni).list();
-        if (customers.isEmpty()) {
-            return null;
-        } else {
-            return customers.get(0); // Return the first matching result
+        Session session = null;
+        try {
+            ConfigDB.buildSessionFactory();
+            session = ConfigDB.getCurrentSession();
+            session.beginTransaction();
+
+            List<CustomerDTO> customers = (List<CustomerDTO>) ConfigDB.getCurrentSession()
+                    .createQuery("from CustomerDTO where dni = :dni")
+                    .setParameter("dni", dni).list();
+
+            session.getTransaction().commit();
+
+            if (customers.isEmpty()) {
+                return null;
+            } else {
+                return customers.get(0); // Return the first matching result
+            }
+
+        } catch (Exception e) {
+            if (session != null) {
+                session.getTransaction().rollback();
+            }
+            System.out.println("Error al buscar en la base de datos en la  tabla CUSTOMER");
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
+        return null;
+
     }
 
     @Override
@@ -69,5 +92,67 @@ public class CustomerRepository implements ObjectRepository<CustomerDTO> {
     @Override
     public CustomerDTO update(CustomerDTO customerDTO) {
         return null;
+    }
+
+    public boolean searchDNI(String dni){
+        Session session = null;
+        try {
+            ConfigDB.buildSessionFactory();
+            session = ConfigDB.getCurrentSession();
+            session.beginTransaction();
+
+            List<CustomerDTO> customers = (List<CustomerDTO>) ConfigDB.getCurrentSession()
+                    .createQuery("from CustomerDTO where dni = :dni")
+                    .setParameter("dni", dni).list();
+
+            session.getTransaction().commit();
+
+            if(customers.isEmpty()){
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            if (session != null) {
+                session.getTransaction().rollback();
+            }
+            System.out.println("Error al buscar en la base de datos en la  tabla CUSTOMER");
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return false;
+    }
+
+    public boolean searchPlate(String plate){
+        Session session = null;
+        try {
+            ConfigDB.buildSessionFactory();
+            session = ConfigDB.getCurrentSession();
+            session.beginTransaction();
+
+            List<CustomerDTO> customers = (List<CustomerDTO>) ConfigDB.getCurrentSession()
+                    .createQuery("from CustomerDTO where plate = :plate")
+                    .setParameter("plate", plate).list();
+
+            session.getTransaction().commit();
+
+            if(customers.isEmpty()){
+                return true;
+            }
+            return false;
+        } catch (Exception e) {
+            if (session != null) {
+                session.getTransaction().rollback();
+            }
+            System.out.println("Error al buscar en la base de datos en la  tabla CUSTOMER");
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+        return false;
     }
 }

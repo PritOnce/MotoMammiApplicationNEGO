@@ -64,7 +64,7 @@ public class AppInsuranceController
             method = RequestMethod.GET,
             produces = "application/json")
     String genInvoiceFile(@PathVariable String codprov,
-                          @PathVariable String date//"20240423"
+                          @PathVariable String date//"202404"
     ){
 
         try{

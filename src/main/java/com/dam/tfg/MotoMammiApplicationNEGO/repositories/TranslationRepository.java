@@ -20,7 +20,7 @@ public class TranslationRepository implements ObjectRepository<TranslationDTO> {
     }
 
     @Override
-    public List<TranslationDTO> retrieve() {
+    public List<TranslationDTO> retrieve(String pSource, String date) {
         return null;
     }
 

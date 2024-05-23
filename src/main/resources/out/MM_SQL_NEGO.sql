@@ -71,7 +71,8 @@ policy_number VARCHAR(20),
 claim_date DATE,
 `description` TEXT,
 `status` VARCHAR(20),
-amount double
+amount double,
+foreign key (dni) references mm_customer(dni)
 );
 
 CREATE TABLE MM_INVOICES (
@@ -81,12 +82,39 @@ dni VARCHAR(10),
 codProv VARCHAR(100),
 plate VARCHAR(10),
 issue_date DATE, -- Fecha en que se emite la factura.
-cost DOUBLE, -- Coste del seguro antes de impuestos.
+cost DOUBLE, -- Coste del seguro.
 send boolean default false,
 FOREIGN KEY (dni) REFERENCES MM_CUSTOMER(dni),
 FOREIGN KEY (codProv) REFERENCES MM_PROVIDERS(codProv),
 FOREIGN KEY (plate) REFERENCES MM_VEHICLES(plate)
 );
+
+INSERT INTO MM_INVOICES (invoice_number, dni, codProv, plate, issue_date, cost, send)
+VALUES ('INV001', '48827175U', 'CAX', '1369PAO', '2024-03-01', 500.00, false),
+       ('INV002', '04850673H', 'CAX', '4274FFX', '2024-05-02', 750.00, false),
+       ('INV003', '77471925M', 'CAX', '2874SCS', '2024-05-03', 600.00, false),
+       ('INV004', '00353733Y', 'CAX', '2130ONI', '2024-05-04', 800.00, false),
+       ('INV005', '60366360R', 'CAX', '2026WFG', '2024-04-05', 550.00, false),
+       ('INV006', '80295839V', 'CAX', '8515IAH', '2024-01-06', 700.00, false),
+       ('INV007', '39362662D', 'CAX', '6649QIE', '2024-05-07', 650.00, false),
+       ('INV008', '21287876G', 'CAX', '8995TJB', '2024-03-08', 900.00, false),
+       ('INV009', '15132593Q', 'CAX', '1763TWV', '2024-02-09', 750.00, false),
+       ('INV010', '84839456D', 'CAX', '9536URD', '2024-02-10', 600.00, false);
+
+SELECT c.dni AS dniCustomer,
+       c.name AS nameCustomer,
+       c.first_surname AS firstSurname,
+       c.last_surname AS lastSurname,
+       v.model AS modelVehicle,
+       v.plate AS plateVehicle,
+       i.cost AS cost,
+       i.invoice_number AS invoiceNumber
+FROM MM_CUSTOMER c
+JOIN MM_VEHICLES v ON c.plate = v.plate
+JOIN MM_INVOICES i ON i.plate = v.plate
+WHERE DATE_FORMAT(i.issue_date, '%Y%m') = "2024-05";
+
+
 
 -- Inserts para MM_PROVIDERS
 INSERT INTO MM_PROVIDERS (codProv, name, dateIni, dateEnd, SwiAct) VALUES

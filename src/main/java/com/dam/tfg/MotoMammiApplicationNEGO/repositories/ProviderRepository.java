@@ -20,7 +20,7 @@ public class ProviderRepository implements ObjectRepository<ProvidersDTO> {
     }
 
     @Override
-    public List<ProvidersDTO> retrieve() {
+    public List<ProvidersDTO> retrieve(String pSource, String date  ) {
         ConfigDB.buildSessionFactory();
         List<ProvidersDTO> proveedores = (List<ProvidersDTO>) ConfigDB.getCurrentSession()
                 .createQuery("from ProvidersDTO where SwiAct = true " +

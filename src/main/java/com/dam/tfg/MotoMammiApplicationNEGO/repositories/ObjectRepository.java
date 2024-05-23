@@ -7,7 +7,7 @@ public interface ObjectRepository<T> {
 
     public void store(T t);
 
-    public List<T> retrieve();
+    public List<T> retrieve(String pSource, String date);
 
     public T search(String codExternal, String codProv, String pSource);
     public List<T> searchList(String codExternal, String codProv);

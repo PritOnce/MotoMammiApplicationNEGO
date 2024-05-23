@@ -16,6 +16,13 @@ public class VehicleRepository implements ObjectRepository<VehicleDTO> {
 
     @Override
     public void store(VehicleDTO vehicleDTO) {
+
+        CustomerRepository customerRepository = new CustomerRepository();
+
+        if (customerRepository.searchPlate(vehicleDTO.getPlate())) {
+            throw new IllegalArgumentException("La placa no existe");
+        }
+
         Session session = null;
         try {
             ConfigDB.buildSessionFactory();
@@ -38,7 +45,7 @@ public class VehicleRepository implements ObjectRepository<VehicleDTO> {
     }
 
     @Override
-    public List<VehicleDTO> retrieve() {
+    public List<VehicleDTO> retrieve(String pSource, String date) {
         return null;
     }
 
