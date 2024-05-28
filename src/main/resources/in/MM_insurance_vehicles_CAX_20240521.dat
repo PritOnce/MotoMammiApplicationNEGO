@@ -1,11 +1,11 @@
-plate,vehicle_type,brand,model
-6649QIE,Ciclomotor,Pontiac,Grand Am
-8995TJB,Vehículo de motor,Volkswagen,Golf III
-2026WFG,Vehículo de motor,Ford,Bronco
-8515IAH,Automóvil,Hyundai,Elantra
-1369PAO,Turismo,Volvo,S40
-4274FFX,Automóvil,Chrysler,Town & Country
-1763TWV,Furgón,Lincoln,Town Car
-2874SCS,Automóvil,Chevrolet,Malibu
-9536URD,Furgón,Ford,F250
-2130ONI,Camión,Chrysler,Town & Country
+plate,vehicle_type,brand,model,dni_customer
+6649QIE,Ciclomotor,Pontiac,Grand Am,39362662D
+8995TJB,Vehículo de motor,Volkswagen,Golf III,21287876G
+2026WFG,Vehículo de motor,Ford,Bronco,60366360R
+8515IAH,Automóvil,Hyundai,Elantra,80295839V
+1369PAO,Turismo,Volvo,S40,48827175U
+4274FFX,Automóvil,Chrysler,Town & Country,04850673H
+1763TWV,Furgón,Lincoln,Town Car,15132593Q
+2874SCS,Automóvil,Chevrolet,Malibu,77471925M
+9536URD,Furgón,Ford,F250,84839456D
+2130ONI,Camión,Chrysler,Town & Country,00353733Y

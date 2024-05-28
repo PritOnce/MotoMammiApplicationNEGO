@@ -16,6 +16,8 @@
         <mapping class="com.dam.tfg.MotoMammiApplicationNEGO.models.VehicleDTO" />
         <mapping class="com.dam.tfg.MotoMammiApplicationNEGO.models.PartsDTO" />
         <mapping class="com.dam.tfg.MotoMammiApplicationNEGO.models.TranslationDTO" />
+        <mapping class="com.dam.tfg.MotoMammiApplicationNEGO.models.InvoicesDTO" />
+        <mapping class="com.dam.tfg.MotoMammiApplicationNEGO.models.ProcessDTO" />
 
     </session-factory>
 </hibernate-configuration>

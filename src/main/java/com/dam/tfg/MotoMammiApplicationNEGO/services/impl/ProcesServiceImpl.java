@@ -5,16 +5,16 @@ import com.dam.tfg.MotoMammiApplicationNEGO.repositories.*;
 import com.dam.tfg.MotoMammiApplicationNEGO.services.ProcesService;
 import com.dam.tfg.MotoMammiApplicationNEGO.utils.Constants;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
+import java.io.*;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,12 +28,18 @@ public class ProcesServiceImpl implements ProcesService {
     private String vehicleFile;
     @Value("${nameFile.parts}")
     private String partsFile;
+    @Value("${nameFile.invoice}")
+    private String invoiceFile;
     @Value("${nameFile.customers.ext}")
     private String extension;
+    @Value("${nameFile.invoices.ext}")
+    private String invoiceExtension;
     @Value("${relative.path}")
     private String relativePath;
     @Value("${path.in}")
     private String pathIn;
+    @Value("${path.out}")
+    private String pathOut;
 
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
@@ -49,6 +55,8 @@ public class ProcesServiceImpl implements ProcesService {
     VehicleRepository vehicleRepository;
     @Autowired
     TranslationRepository translationRepository;
+    @Autowired
+    InvoiceRepository invoiceRepository;
     @Autowired
     InvoicesRepository invoicesRepository;
 
@@ -115,7 +123,7 @@ public class ProcesServiceImpl implements ProcesService {
     }
 
     private void serDataInterfaceCustomer(List<String> data, String codProv, String pSource) {
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd'T'HH:mm:ss.SSS'Z'").create();
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
@@ -197,7 +205,7 @@ public class ProcesServiceImpl implements ProcesService {
     }
 
     private void serDataInterfaceVehicles(List<String> data, String codProv, String pSource) {
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
         try {
@@ -214,6 +222,7 @@ public class ProcesServiceImpl implements ProcesService {
                 vehicleDTO.setVehicleType(datos[1]);
                 vehicleDTO.setBrand(datos[2]);
                 vehicleDTO.setModel(datos[3]);
+                vehicleDTO.setDni_customer(datos[4]);
 
                 String json = gson.toJson(vehicleDTO);
 
@@ -267,7 +276,7 @@ public class ProcesServiceImpl implements ProcesService {
     }
 
     private void serDataInterfaceParts(List<String> data, String codProv, String pSource) {
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
@@ -363,7 +372,7 @@ public class ProcesServiceImpl implements ProcesService {
     }
 
     private void integrateInfoCustomer(String codProv, List<InterfaceDTO> interfaceDTOS) {
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
         for (InterfaceDTO interfaceDTO : interfaceDTOS) {
@@ -405,7 +414,7 @@ public class ProcesServiceImpl implements ProcesService {
     }
 
     private void integrateInfoParts(String codProv, List<InterfaceDTO> interfaceDTOS) {
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
         for (InterfaceDTO interfaceDTO : interfaceDTOS) {
@@ -440,7 +449,7 @@ public class ProcesServiceImpl implements ProcesService {
     }
 
     private void integrateInfoVehicles(String codProv, List<InterfaceDTO> interfaceDTOS) {
-        Gson gson = new Gson();
+        Gson gson = new GsonBuilder().setDateFormat("yyyy/MM/dd").create();
         Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 
         for (InterfaceDTO interfaceDTO : interfaceDTOS) {
@@ -477,7 +486,62 @@ public class ProcesServiceImpl implements ProcesService {
 
     @Override
     public void genInvoiceFile(String codProv, String date) {
-        List<InvoicesDTO> invoicesDTO = invoicesRepository.retrieve(codProv, date);
+        List<ProvidersDTO> proveedor = providerRepository.retrieve("", "");
+
+        for (ProvidersDTO provider: proveedor) {
+
+            if (codProv.isEmpty()) {
+                codProv = provider.getCodProv();
+            }
+
+            if (date.isEmpty()) {
+                date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
+            }
+
+            String fileName = relativePath+pathOut+invoiceFile+codProv+"_"+date+invoiceExtension;
+            File file = new File(fileName);
+
+            List<InvoiceDTO> invoiceDTOS = invoiceRepository.searchList(codProv, date);
+            
+            try (FileWriter writer = new FileWriter(file, true)) {
+
+                if (!invoiceDTOS.isEmpty()) {
+                    writer.append("dni,nombre,ape1,ape2,model,plate,cost,invoice_number\n");
+
+                }
+                    for (InvoiceDTO invoice: invoiceDTOS) {
+                        List<InvoicesDTO> invoices = invoicesRepository.retrieve(codProv, date);
+
+                        writer.append(invoice.getDniCustomer());
+                        writer.append(",");
+                        writer.append(invoice.getNameCustomer());
+                        writer.append(",");
+                        writer.append(invoice.getFirstSurname());
+                        writer.append(",");
+                        writer.append(invoice.getSecondSurname());
+                        writer.append(",");
+                        writer.append(invoice.getModelVehicle());
+                        writer.append(",");
+                        writer.append(invoice.getPlateVehicle());
+                        writer.append(",");
+                        writer.append(String.valueOf(invoice.getCost()));
+                        writer.append(",");
+                        writer.append(invoice.getInvoiceNumber());
+                        writer.append("\n");
+                        writer.flush();
+
+                        for (InvoicesDTO invoicesDTO: invoices) {
+                            if (invoicesDTO.getInvoiceNumber().equals(invoice.getInvoiceNumber())){
+                                invoicesRepository.update(invoicesDTO);
+                            }
+                        }
+                    }
+
+                    System.out.println("Archivo " + fileName + " creado.");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private int validateExistCustomer(String dni) {

@@ -1,77 +1,84 @@
 package com.dam.tfg.MotoMammiApplicationNEGO.models;
-
+import javax.persistence.*;
 import java.util.Date;
 
+@Entity
+@Table(name = "mm_invoices")
 public class InvoicesDTO {
 
-    private String dniCustomer;
-    private String nameCustomer;
-    private String firstSurname;
-    private String secondSurname;
-    private String modelVehicle;
-    private String plateVehicle;
-    private Date issue_date;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-    public Date getIssue_date() {
-        return issue_date;
-    }
-
-    public void setIssue_date(Date issue_date) {
-        this.issue_date = issue_date;
-    }
-
-    private double cost;
+    @Column(name = "invoice_number", unique = true, nullable = false, length = 20)
     private String invoiceNumber;
 
-    public InvoicesDTO() {
+    @Column(name = "dni", length = 10)
+    private String dni;
+
+    @Column(name = "codProv", length = 100)
+    private String codProv;
+
+    @Column(name = "plate", length = 10)
+    private String plate;
+
+    @Column(name = "issue_date")
+    @Temporal(TemporalType.DATE)
+    private Date issueDate;
+
+    @Column(name = "cost")
+    private double cost;
+
+    @Column(name = "send", columnDefinition = "boolean default false")
+    private boolean send;
+
+    // Getters y setters
+    public int getId() {
+        return id;
     }
 
-    public String getDniCustomer() {
-        return dniCustomer;
+    public void setId(int id) {
+        this.id = id;
     }
 
-    public void setDniCustomer(String dniCustomer) {
-        this.dniCustomer = dniCustomer;
+    public String getInvoiceNumber() {
+        return invoiceNumber;
     }
 
-    public String getNameCustomer() {
-        return nameCustomer;
+    public void setInvoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
     }
 
-    public void setNameCustomer(String nameCustomer) {
-        this.nameCustomer = nameCustomer;
+    public String getDni() {
+        return dni;
     }
 
-    public String getFirstSurname() {
-        return firstSurname;
+    public void setDni(String dni) {
+        this.dni = dni;
     }
 
-    public void setFirstSurname(String firstSurname) {
-        this.firstSurname = firstSurname;
+    public String getCodProv() {
+        return codProv;
     }
 
-    public String getSecondSurname() {
-        return secondSurname;
+    public void setCodProv(String codProv) {
+        this.codProv = codProv;
     }
 
-    public void setSecondSurname(String secondSurname) {
-        this.secondSurname = secondSurname;
+    public String getPlate() {
+        return plate;
     }
 
-    public String getModelVehicle() {
-        return modelVehicle;
+    public void setPlate(String plate) {
+        this.plate = plate;
     }
 
-    public void setModelVehicle(String modelVehicle) {
-        this.modelVehicle = modelVehicle;
+    public Date getIssueDate() {
+        return issueDate;
     }
 
-    public String getPlateVehicle() {
-        return plateVehicle;
-    }
-
-    public void setPlateVehicle(String plateVehicle) {
-        this.plateVehicle = plateVehicle;
+    public void setIssueDate(Date issueDate) {
+        this.issueDate = issueDate;
     }
 
     public double getCost() {
@@ -82,11 +89,11 @@ public class InvoicesDTO {
         this.cost = cost;
     }
 
-    public String getInvoiceNumber() {
-        return invoiceNumber;
+    public boolean isSend() {
+        return send;
     }
 
-    public void setInvoiceNumber(String invoiceNumber) {
-        this.invoiceNumber = invoiceNumber;
+    public void setSend(boolean send) {
+        this.send = send;
     }
 }

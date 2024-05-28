@@ -56,11 +56,11 @@ plate varchar(10) unique
 
 CREATE TABLE MM_VEHICLES(
 id int auto_increment primary key,
-plate varchar(10),
+plate varchar(10) unique,
 vehicle_type varchar(30),
 brand varchar(20),
 model varchar(20),
-foreign key (plate) references MM_CUSTOMER(plate)
+dni_customer varchar(10)
 );
 
 CREATE TABLE MM_PARTS (
@@ -71,8 +71,7 @@ policy_number VARCHAR(20),
 claim_date DATE,
 `description` TEXT,
 `status` VARCHAR(20),
-amount double,
-foreign key (dni) references mm_customer(dni)
+amount double
 );
 
 CREATE TABLE MM_INVOICES (
@@ -89,17 +88,25 @@ FOREIGN KEY (codProv) REFERENCES MM_PROVIDERS(codProv),
 FOREIGN KEY (plate) REFERENCES MM_VEHICLES(plate)
 );
 
+CREATE TABLE MM_PROCESS (
+id INT PRIMARY KEY auto_increment,
+process_name varchar(20),
+status boolean default true
+);
+
+INSERT INTO MM_PROCESS(process_name, status)
+values ('callProcessReadInfo', true),
+('callIntegrateInfo', true),
+('genInvoiceFile', true);
+
 INSERT INTO MM_INVOICES (invoice_number, dni, codProv, plate, issue_date, cost, send)
-VALUES ('INV001', '48827175U', 'CAX', '1369PAO', '2024-03-01', 500.00, false),
-       ('INV002', '04850673H', 'CAX', '4274FFX', '2024-05-02', 750.00, false),
-       ('INV003', '77471925M', 'CAX', '2874SCS', '2024-05-03', 600.00, false),
-       ('INV004', '00353733Y', 'CAX', '2130ONI', '2024-05-04', 800.00, false),
-       ('INV005', '60366360R', 'CAX', '2026WFG', '2024-04-05', 550.00, false),
-       ('INV006', '80295839V', 'CAX', '8515IAH', '2024-01-06', 700.00, false),
-       ('INV007', '39362662D', 'CAX', '6649QIE', '2024-05-07', 650.00, false),
-       ('INV008', '21287876G', 'CAX', '8995TJB', '2024-03-08', 900.00, false),
-       ('INV009', '15132593Q', 'CAX', '1763TWV', '2024-02-09', 750.00, false),
-       ('INV010', '84839456D', 'CAX', '9536URD', '2024-02-10', 600.00, false);
+VALUES ('INV001', '48827175U', 'CAX', '1369PAO', '2024-03-01', 4864.33, false),
+       ('INV002', '04850673H', 'CAX', '4274FFX', '2024-05-02', 4511.68, false),
+       ('INV003', '77471925M', 'CAX', '2874SCS', '2024-05-03', 1127.64, false),
+       ('INV004', '00353733Y', 'CAX', '2130ONI', '2024-05-04', 2620.00, false),
+       ('INV005', '39362662D', 'CAX', '2026WFG', '2024-04-05', 1026.03, false);
+
+SELECT * FROM mm_nego.mm_parts;
 
 SELECT c.dni AS dniCustomer,
        c.name AS nameCustomer,

@@ -22,7 +22,24 @@ public class VehicleDTO  {
 
     @Column(name = "model", nullable = false)
     private String model;
+    @Column(name = "dni_customer")
+    private String dni_customer;
 
+    public String getVehicle_type() {
+        return vehicle_type;
+    }
+
+    public void setVehicle_type(String vehicle_type) {
+        this.vehicle_type = vehicle_type;
+    }
+
+    public String getDni_customer() {
+        return dni_customer;
+    }
+
+    public void setDni_customer(String dni_customer) {
+        this.dni_customer = dni_customer;
+    }
     // Getters and Setters
 
     public int getId() {
