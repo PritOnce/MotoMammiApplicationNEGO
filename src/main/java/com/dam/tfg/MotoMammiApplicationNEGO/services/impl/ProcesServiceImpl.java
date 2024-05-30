@@ -381,7 +381,7 @@ public class ProcesServiceImpl implements ProcesService {
                 int validateCustomerExist = validateExistCustomer(c.getDni());
                 System.out.println("VALOR DE CUSTOMER EXISTE: " + validateCustomerExist);
 
-                if(codProv.isEmpty()){
+                if(codProv.isEmpty() || codProv == null){
                     codProv = interfaceDTO.getCodProv();
                 }
 
@@ -490,11 +490,11 @@ public class ProcesServiceImpl implements ProcesService {
 
         for (ProvidersDTO provider: proveedor) {
 
-            if (codProv.isEmpty()) {
+            if (codProv.isEmpty() || codProv == null) {
                 codProv = provider.getCodProv();
             }
 
-            if (date.isEmpty()) {
+            if (date.isEmpty() || date == null) {
                 date = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMM"));
             }
 
@@ -607,7 +607,7 @@ public class ProcesServiceImpl implements ProcesService {
         }
 
         if ( date != null ) {
-            if (codProv.isEmpty()){
+            if (codProv.isEmpty() || codProv == null) {
                 return relativePath+pathIn+typeOfFile+codProvConsulta+"_"+date+extension;
             }else{
                 return relativePath+pathIn+typeOfFile+codProv+"_"+date+extension;
