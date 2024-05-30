@@ -75,7 +75,7 @@ public class ProcesServiceImpl implements ProcesService {
                 try{
                     String codigoProveedor;
 
-                    if (codProv.isEmpty()){
+                    if (codProv == null){
                         codigoProveedor = prov.getCodProv();
                     } else {
                         codigoProveedor = codProv;
@@ -606,7 +606,7 @@ public class ProcesServiceImpl implements ProcesService {
             typeOfFile = vehicleFile;
         }
 
-        if ( !date.isEmpty() ) {
+        if ( date != null ) {
             if (codProv.isEmpty()){
                 return relativePath+pathIn+typeOfFile+codProvConsulta+"_"+date+extension;
             }else{
@@ -614,7 +614,7 @@ public class ProcesServiceImpl implements ProcesService {
             }
         }
 
-        if (codProv.isEmpty()){
+        if (codProv == null){
             return relativePath+pathIn+typeOfFile+codProvConsulta+"_"+fechaActual[0]+fechaActual[1]+fechaActual[2]+extension;
         }else{
             return relativePath+pathIn+typeOfFile+codProv+"_"+fechaActual[0]+fechaActual[1]+fechaActual[2]+extension;
